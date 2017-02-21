@@ -3,9 +3,8 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
-public class Bomb {
+public class Bomb extends Entity {
 	Texture bombImg, flashImg;
-	Vector2 pos;
 	
 	float timeToDetonate;
 	float timeToRemove;
@@ -14,14 +13,8 @@ public class Bomb {
 	
 	boolean detonating;
 	
-	public Bomb(Vector2 pos, Texture bImg, Texture fImg) {
-		new Bomb(pos.x, pos.y, bImg, fImg);
-	}
-	
-	public Bomb(float x, float y, Texture bImg, Texture fImg) {
-		System.out.println(x);
-		System.out.println(y);
-		pos = new Vector2(x, y);
+	public Bomb(Vector2 pos, Vector2 size, Texture bImg, Texture fImg) {
+		super(pos, size);
 		bombImg = bImg;
 		flashImg = fImg;
 		detonating = true;
@@ -29,28 +22,33 @@ public class Bomb {
 		timeToRemove = Bomb.FLASHTIMER;
 	}
 	
-	public boolean update(float delta_h) {
+	public Bomb(Texture bImg, Texture fImg) {
+		super(0, 0, 0 ,0);
+		new Bomb(new Vector2(0, 0), new Vector2(0, 0),bImg, fImg);
+	}
+	
+	@Override
+	public void update(float delta_t) {
 		if (detonating) {
-			timeToDetonate -= delta_h;
+			timeToDetonate -= delta_t;
 			if (timeToDetonate <= 0)
 				detonating = false;
-		}
-		else {
-			timeToRemove -= delta_h;
-		}
-		
-		if (timeToRemove <= 0) {
-			return false;
 		} else {
-			return true;
+			timeToRemove -= delta_t;
 		}
 	}
 	
-	public Vector2 getPos() {
-		return pos;
+	@Override
+	public boolean shouldRemove() {
+		if (timeToRemove <= 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
-	public Texture img() {
+	@Override
+	public Texture getTexture() {
 		if (detonating && timeToDetonate > 0)
 			return this.bombImg;
 		else
@@ -61,5 +59,4 @@ public class Bomb {
 		bombImg.dispose();
 		flashImg.dispose();
 	}
-
 }

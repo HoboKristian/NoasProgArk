@@ -16,7 +16,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	GameState gameState;
 	Player player;
-	Array<Bomb> bombs = new Array<Bomb>();
+	Array<Entity> entities = new Array<Entity>();
 	
 	Texture bombImg, flashImg;
 	
@@ -59,7 +59,9 @@ public class MyGdxGame extends ApplicationAdapter {
 		if(Gdx.input.isKeyPressed(Keys.UP)) playerMovement.y += GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
 		if(Gdx.input.isKeyPressed(Keys.DOWN)) playerMovement.y -= GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
 		if(Gdx.input.isKeyPressed(Keys.A)) {
-			bombs.add(new Bomb(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4, bombImg, flashImg));
+			Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
+			Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
+			entities.add(new Bomb(bombPos, bombSize, bombImg, flashImg));
 		}
 
 		Rectangle playerRectX = player.getHitbox(); playerRectX.x += playerMovement.x;
@@ -87,20 +89,10 @@ public class MyGdxGame extends ApplicationAdapter {
 			player.move(0, playerMovement.y);
 		
 		float BLOCK_PADDING = 1;
-		/*float cameraX = cam.position.x - cam.viewportWidth / 2 + GameState.BLOCK_SIZE * BLOCK_PADDING;
-		float cameraY = cam.position.y - cam.viewportHeight / 2 + GameState.BLOCK_SIZE * BLOCK_PADDING;
-		Rectangle cameraRect = new Rectangle(cameraX, cameraY,
-											cam.viewportWidth - GameState.BLOCK_SIZE * BLOCK_PADDING * 2,
-											cam.viewportHeight - GameState.BLOCK_SIZE * BLOCK_PADDING * 2);
-		*/
 		float playerX = player.getPos().x + GameState.BLOCK_SIZE / 2;
 		float playerY = player.getPos().y + GameState.BLOCK_SIZE / 2;
 		cam.position.x = MathUtils.clamp(cam.position.x, playerX - GameState.BLOCK_SIZE * BLOCK_PADDING, playerX + GameState.BLOCK_SIZE * BLOCK_PADDING);
 		cam.position.y = MathUtils.clamp(cam.position.y, playerY- GameState.BLOCK_SIZE * BLOCK_PADDING, playerY + GameState.BLOCK_SIZE * BLOCK_PADDING);
-		/*if (!cameraRect.contains(player.getPos().cpy().add(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2))) {
-		//if ( .dst2(new Vector2(cam.position.x, cam.position.y)) <= GameState.BLOCK_SIZE * 3) {
-			cam.position.add(playerMovement.x, playerMovement.y, 0);
-		}*/
 		
 		batch.begin();
 		for (int x = 0; x < GameState.WIDTH; x++) {
@@ -109,11 +101,11 @@ public class MyGdxGame extends ApplicationAdapter {
 					batch.draw(tiles.getTextureForBox(gameState.getState(x, y)), x * GameState.BLOCK_SIZE, y * GameState.BLOCK_SIZE, GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
 			}
 		}
-		for (Bomb b : bombs) {
-			boolean keep = b.update(Gdx.graphics.getDeltaTime());
+		for (Entity b : entities) {
+			b.update(Gdx.graphics.getDeltaTime());
 			Vector2 bombPos = b.getPos();
-			if (keep) {
-				batch.draw(b.img(), (int)bombPos.x, (int)bombPos.y, GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
+			if (!b.shouldRemove()) {
+				batch.draw(b.getTexture(), (int)bombPos.x, (int)bombPos.y, GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
 			} else {
 				int bx = (int)(bombPos.x / GameState.BLOCK_SIZE);
 				int by = (int)(bombPos.y / GameState.BLOCK_SIZE);
@@ -124,7 +116,7 @@ public class MyGdxGame extends ApplicationAdapter {
 						}
 					}
 				}
-				bombs.removeIndex(0);
+				entities.removeIndex(0);
 				// remove bomb
 			}
 		}
