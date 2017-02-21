@@ -32,26 +32,21 @@ public class MyGdxGame extends ApplicationAdapter {
 		gameState = new GameState();
 		batch = new SpriteBatch();
 		player = new Player(GameState.BLOCK_SIZE * 2, GameState.BLOCK_SIZE * 2);
-		tiles = new Tiles();
 		
 		float GAME_WIDTH = Gdx.graphics.getWidth();
-        float GAME_HEIGHT = Gdx.graphics.getHeight();
+		float GAME_HEIGHT = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(30, 30 * (GAME_HEIGHT / GAME_WIDTH));
 
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 		cam.zoom = 1.0f;
 		cam.update();
+		
+		Door door = new Door(new Vector2(5 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE));
+		gameState.setTile(door, 5, 9);
+		entities.add(new Key(new Vector2(20, 20), new Vector2(2, 2), Tiles.getInstance().getTextureForType(GameState.EntityType.KEY), door));
 	}
-
-	@Override
-	public void render () {
-		cam.update();
-		batch.setProjectionMatrix(cam.combined);
-		
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		Vector2 playerMovement = new Vector2(0, 0);
+	
+	public void handleInput(Vector2 playerMovement) {
 		if(Gdx.input.isKeyPressed(Keys.LEFT)) playerMovement.x -= GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
 		if(Gdx.input.isKeyPressed(Keys.RIGHT)) playerMovement.x += GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
 		if(Gdx.input.isKeyPressed(Keys.UP)) playerMovement.y += GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
@@ -61,16 +56,19 @@ public class MyGdxGame extends ApplicationAdapter {
 			Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
 			entities.add(new Bomb(bombPos, bombSize));
 		}
-
+	}
+	
+	public void testPlayerMovement(Vector2 playerMovement) {
 		Rectangle playerRectX = player.getHitbox(); playerRectX.x += playerMovement.x;
 		Rectangle playerRectY = player.getHitbox(); playerRectY.y += playerMovement.y;
 		boolean blockedX = false;
 		boolean blockedY = false;
 		for (int x = 0; x < GameState.WIDTH; x++) {
 			for (int y = 0; y < GameState.HEIGHT; y++) {
-				if (gameState.getState(x, y) == GameState.BoxType.OPEN) continue;
+				Tile t = gameState.getTile(x, y);
+				if (t.getType() == GameState.BoxType.OPEN) continue;
 				
-				Rectangle box = new Rectangle(x * GameState.BLOCK_SIZE, y * GameState.BLOCK_SIZE, GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+				Rectangle box = t.getCollisionRectangle();
 				if (box.overlaps(playerRectX)) {
 					blockedX = true;
 				} if (box.overlaps(playerRectY)) {
@@ -85,42 +83,89 @@ public class MyGdxGame extends ApplicationAdapter {
 			player.move(playerMovement.x, 0);
 		if (!blockedY)
 			player.move(0, playerMovement.y);
-		
+	}
+	
+	public void testEntityCollision() {
+		Rectangle playerRect = player.getHitbox();
+		for (Entity e : entities) {
+			if (playerRect.overlaps(e.getCollisionRectangle())) {
+				e.collide();
+			}
+		}
+	}
+
+	public void clampCamera() {
 		float BLOCK_PADDING = 1;
 		float playerX = player.getPos().x + GameState.BLOCK_SIZE / 2;
 		float playerY = player.getPos().y + GameState.BLOCK_SIZE / 2;
 		cam.position.x = MathUtils.clamp(cam.position.x, playerX - GameState.BLOCK_SIZE * BLOCK_PADDING, playerX + GameState.BLOCK_SIZE * BLOCK_PADDING);
 		cam.position.y = MathUtils.clamp(cam.position.y, playerY- GameState.BLOCK_SIZE * BLOCK_PADDING, playerY + GameState.BLOCK_SIZE * BLOCK_PADDING);
-		
-		batch.begin();
+	}
+	
+	public void batchDrawPosSize(SpriteBatch b, Texture t, Vector2 p, Vector2 s) {
+		b.draw(t, p.x, p.y, s.x, s.y);
+	}
+	
+	public void renderTiles() {
 		for (int x = 0; x < GameState.WIDTH; x++) {
 			for (int y = 0; y < GameState.HEIGHT; y++) {
-				if (gameState.getState(x, y) != GameState.BoxType.OPEN)
-					batch.draw(tiles.getTextureForBox(gameState.getState(x, y)), x * GameState.BLOCK_SIZE, y * GameState.BLOCK_SIZE, GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+				Tile t = gameState.getTile(x, y);
+				if (t.getType() != GameState.BoxType.OPEN) {
+					if (t.shouldRemove())
+						gameState.setTile(new Tile(new Vector2(x, y), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE), GameState.BoxType.OPEN), x, y);
+					this.batchDrawPosSize(batch, t.getTexture(), t.getPos(), t.getSize());
+				}
 			}
 		}
-		for (Entity b : entities) {
-			b.update(Gdx.graphics.getDeltaTime());
-			Vector2 bombPos = b.getPos();
-			if (!b.shouldRemove()) {
-				batch.draw(b.getTexture(), (int)bombPos.x, (int)bombPos.y, GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
+	}
+	
+	public void renderEntities() {
+		for (Entity e : entities) {
+			e.update(Gdx.graphics.getDeltaTime());
+			if (!e.shouldRemove()) {
+				this.batchDrawPosSize(batch, e.getTexture(), e.getPos(), e.getSize());
 			} else {
-				int bx = (int)(bombPos.x / GameState.BLOCK_SIZE);
-				int by = (int)(bombPos.y / GameState.BLOCK_SIZE);
-				for (int x = bx - 1; x <= bx + 1; x++) {
-					for (int y = by - 1; y <= by + 1; y++) {
-						if (gameState.getState(x, y) == GameState.BoxType.BOX) {
-							gameState.setState(GameState.BoxType.OPEN, x, y);
+				if (e instanceof Bomb) {
+					Vector2 bombPos = e.getPos();
+					int bx = (int)(bombPos.x / GameState.BLOCK_SIZE);
+					int by = (int)(bombPos.y / GameState.BLOCK_SIZE);
+					for (int x = bx - 1; x <= bx + 1; x++) {
+						for (int y = by - 1; y <= by + 1; y++) {
+							if (gameState.getTile(x, y).getType() == GameState.BoxType.BOX) {
+								gameState.setTile(new Tile(new Vector2(x, y), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE), GameState.BoxType.OPEN), x, y);
+							}
 						}
 					}
 				}
 				entities.removeIndex(0);
-				// remove bomb
 			}
 		}
+	}
+	
+	public void renderPlayer() {
 		Vector2 playerPos = player.getPos();
 		batch.draw(player.img(), (float)playerPos.x, (float)playerPos.y, GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+	}
+	
+	@Override
+	public void render () {
+		cam.update();
+		batch.setProjectionMatrix(cam.combined);
 		
+		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		Vector2 playerMovement = new Vector2(0, 0);
+		handleInput(playerMovement);
+		testPlayerMovement(playerMovement);
+		testEntityCollision();
+		
+		clampCamera();
+
+		batch.begin();
+		renderTiles();
+		renderEntities();
+		renderPlayer();
 		batch.end();
 	}
 	

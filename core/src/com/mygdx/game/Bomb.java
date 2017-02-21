@@ -16,8 +16,8 @@ public class Bomb extends Entity {
 	
 	public Bomb(Vector2 pos, Vector2 size) {
 		super(pos, size);
-		bombImg = Tiles.entity.get(EntityType.BOMB);
-		flashImg = Tiles.entity.get(EntityType.FLASH_BOMB);
+		bombImg = Tiles.getInstance().getTextureForType(EntityType.BOMB);
+		flashImg = Tiles.getInstance().getTextureForType(EntityType.FLASH_BOMB);
 		detonating = true;
 		timeToDetonate = Bomb.BOMBTIMER;
 		timeToRemove = Bomb.FLASHTIMER;

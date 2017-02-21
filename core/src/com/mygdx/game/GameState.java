@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class GameState {
-	public static enum BoxType {OPEN, BOX, STONE};
+	public static enum BoxType {OPEN, BOX, STONE, DOOR};
 	public static enum EntityType {BOMB, FLASH_BOMB, KEY};
 	
 	public static int WIDTH;
@@ -9,7 +11,7 @@ public class GameState {
 	
 	public static int BLOCK_SIZE = 4;
 	
-	BoxType[][] map;
+	private Tile[][] map;
 	int[][] testMap = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 			{1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 			{1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -25,25 +27,42 @@ public class GameState {
 			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+	
 	public GameState() {
 		GameState.WIDTH = testMap.length;
 		GameState.HEIGHT = testMap[0].length;
-		map = new BoxType[WIDTH][HEIGHT];
-		BoxType[] values = BoxType.values();
+		map = new Tile[WIDTH][HEIGHT];
 		for (int x = 0; x < GameState.WIDTH; x++) {
 			for (int y = 0; y < GameState.HEIGHT; y++) {
-				map[x][y] = values[testMap[x][y]];
+				BoxType b;
+				switch (testMap[x][y]) {
+				case 0:
+					b = GameState.BoxType.OPEN;
+					break;
+				case 1:
+					b = GameState.BoxType.BOX;
+					break;
+				case 2:
+					b = GameState.BoxType.STONE;
+					break;
+				default:
+					b = GameState.BoxType.OPEN;
+					break;
+				}
+				Vector2 pos = new Vector2(x * GameState.BLOCK_SIZE, y * GameState.BLOCK_SIZE);
+				Vector2 size = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+				map[x][y] = new Tile(pos, size, b);
 			}
 		}
 	}
 	
-	public BoxType getState(int x, int y) {
+	public Tile getTile(int x, int y) {
 		return map[x][y];
-	}	
+	}
 	
-	public void setState(BoxType state, int x, int y) throws IllegalArgumentException {
+	public void setTile(Tile t, int x, int y) throws IllegalArgumentException {
 		if (x >= WIDTH || x < 0 || y >= HEIGHT || y < 0)
 			throw new IllegalArgumentException();
-		map[x][y] = state;
+		map[x][y] = t;
 	}
 }
