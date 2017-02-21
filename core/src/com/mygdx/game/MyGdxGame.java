@@ -32,8 +32,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		gameState = new GameState();
 		batch = new SpriteBatch();
 		player = new Player(GameState.BLOCK_SIZE * 2, GameState.BLOCK_SIZE * 2);
-		bombImg = new Texture(Gdx.files.internal("Items/bomb.png"));
-		flashImg = new Texture(Gdx.files.internal("Items/bombFlash.png"));
 		tiles = new Tiles();
 		
 		float GAME_WIDTH = Gdx.graphics.getWidth();
@@ -61,7 +59,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		if(Gdx.input.isKeyPressed(Keys.A)) {
 			Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
 			Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
-			entities.add(new Bomb(bombPos, bombSize, bombImg, flashImg));
+			entities.add(new Bomb(bombPos, bombSize));
 		}
 
 		Rectangle playerRectX = player.getHitbox(); playerRectX.x += playerMovement.x;

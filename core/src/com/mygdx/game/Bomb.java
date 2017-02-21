@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.GameState.EntityType;
 
 public class Bomb extends Entity {
 	Texture bombImg, flashImg;
@@ -13,18 +14,13 @@ public class Bomb extends Entity {
 	
 	boolean detonating;
 	
-	public Bomb(Vector2 pos, Vector2 size, Texture bImg, Texture fImg) {
+	public Bomb(Vector2 pos, Vector2 size) {
 		super(pos, size);
-		bombImg = bImg;
-		flashImg = fImg;
+		bombImg = Tiles.entity.get(EntityType.BOMB);
+		flashImg = Tiles.entity.get(EntityType.FLASH_BOMB);
 		detonating = true;
 		timeToDetonate = Bomb.BOMBTIMER;
 		timeToRemove = Bomb.FLASHTIMER;
-	}
-	
-	public Bomb(Texture bImg, Texture fImg) {
-		super(0, 0, 0 ,0);
-		new Bomb(new Vector2(0, 0), new Vector2(0, 0),bImg, fImg);
 	}
 	
 	@Override

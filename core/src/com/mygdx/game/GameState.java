@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 public class GameState {
 	public static enum BoxType {OPEN, BOX, STONE};
+	public static enum EntityType {BOMB, FLASH_BOMB, KEY};
 	
 	public static int WIDTH;
 	public static int HEIGHT;
