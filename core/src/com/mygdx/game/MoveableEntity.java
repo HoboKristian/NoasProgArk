@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class MoveableEntity extends Entity {
-	public Vector2 pos;
 	public MoveableEntity(Vector2 pos, Vector2 size, Texture texture) {
 		super(pos, size, texture);
 	}
@@ -14,6 +13,6 @@ public abstract class MoveableEntity extends Entity {
 	}
 	
 	protected void setPos(Vector2 pos) {
-		this.pos = pos;
+		super.pos = pos;
 	}
 }
