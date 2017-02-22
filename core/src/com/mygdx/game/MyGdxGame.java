@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
+	Sprite backgroundImage;
 	GameState gameState;
 	Player player;
 	Array<Entity> entities = new Array<Entity>();
@@ -32,7 +34,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		gameState = new GameState();
 		batch = new SpriteBatch();
 		player = new Player(GameState.BLOCK_SIZE * 2, GameState.BLOCK_SIZE * 2);
-		
+		backgroundImage = new Sprite(new Texture(Gdx.files.internal("bg_castle.png")));
 		float GAME_WIDTH = Gdx.graphics.getWidth();
 		float GAME_HEIGHT = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(30, 30 * (GAME_HEIGHT / GAME_WIDTH));
@@ -120,7 +122,8 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 	
 	public void renderEntities() {
-		for (Entity e : entities) {
+		for (int i = 0; i < entities.size; i++) {
+			Entity e = entities.get(i);
 			e.update(Gdx.graphics.getDeltaTime());
 			if (!e.shouldRemove()) {
 				this.batchDrawPosSize(batch, e.getTexture(), e.getPos(), e.getSize());
@@ -136,8 +139,9 @@ public class MyGdxGame extends ApplicationAdapter {
 							}
 						}
 					}
+					entities.removeIndex(i);
+					i--;
 				}
-				entities.removeIndex(0);
 			}
 		}
 	}
@@ -152,7 +156,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		cam.update();
 		batch.setProjectionMatrix(cam.combined);
 		
-		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClearColor(0.7f, 0.7f, 0.7f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		Vector2 playerMovement = new Vector2(0, 0);
@@ -163,6 +167,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		clampCamera();
 
 		batch.begin();
+		//batch.draw(backgroundImage, -20, -20);
 		renderTiles();
 		renderEntities();
 		renderPlayer();

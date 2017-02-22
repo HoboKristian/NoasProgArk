@@ -57,6 +57,8 @@ public class GameState {
 	}
 	
 	public Tile getTile(int x, int y) {
+		if (x >= WIDTH || x < 0 || y >= HEIGHT || y < 0)
+			throw new IllegalArgumentException();
 		return map[x][y];
 	}
 	
