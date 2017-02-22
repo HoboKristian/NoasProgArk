@@ -4,15 +4,20 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class Player extends MoveableEntity{
+public class Player extends MoveableEntity implements PowerupListener{
+	Vector2 velocity;
 	public Player(Vector2 pos, Vector2 size, Texture tex) {
 		super(pos, size, tex);
+		this.velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
 	}
 	public void move(Vector2 movement) {
 		this.move(movement.x, movement.y);
 	}
 	public void move(float delta_x, float delta_y) {
 		super.moveEntity(new Vector2(delta_x, delta_y));
+	}
+	public Vector2 getVelocity() {
+		return this.velocity;
 	}
 	
 	@Override
@@ -23,15 +28,12 @@ public class Player extends MoveableEntity{
 	}
 	
 	@Override
-	public boolean shouldRemove() {
+	public void powerupPickedUp(Entity powerup) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public void update(float delta_t) {
-		// TODO Auto-generated method stub
-		
+		if (powerup instanceof PowerupWalkFaster) {
+			this.velocity = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+			System.out.println("powerup");
+		}
 	}
 
 }

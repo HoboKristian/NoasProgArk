@@ -25,6 +25,8 @@ public class Tiles {
 		entity.put(EntityType.FLASH_BOMB, new Texture(Gdx.files.internal("Items/bombFlash.png")));
 		entity.put(EntityType.KEY, new Texture(Gdx.files.internal("Items/keyYellow.png")));
 		entity.put(EntityType.PLAYER, new Texture(Gdx.files.internal("Player/p3_front.png")));
+		entity.put(EntityType.POWERUP_WALK_FAST, new Texture(Gdx.files.internal("Items/gemBlue.png")));
+		entity.put(EntityType.POWERUP_WALK_WALL, new Texture(Gdx.files.internal("Items/gemYellow.png")));
 	}
 	
 	public Texture getTextureForType(Object type) {

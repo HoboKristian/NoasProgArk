@@ -50,13 +50,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		gameState.setTile(door, 5, 9);
 		key.registerKeyListener(door);
 		entities.add(key);
+		
+		PowerupWalkFaster powerup = new PowerupWalkFaster(new Vector2(24, 28), new Vector2(2, 2));
+		entities.add(powerup);
+		powerup.registerPowerupListener(player);
 	}
 	
 	public void handleInput(Vector2 playerMovement) {
-		if(Gdx.input.isKeyPressed(Keys.LEFT)) playerMovement.x -= GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
-		if(Gdx.input.isKeyPressed(Keys.RIGHT)) playerMovement.x += GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
-		if(Gdx.input.isKeyPressed(Keys.UP)) playerMovement.y += GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
-		if(Gdx.input.isKeyPressed(Keys.DOWN)) playerMovement.y -= GameState.BLOCK_SIZE * 5 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.LEFT)) playerMovement.x -= player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.RIGHT)) playerMovement.x += player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.UP)) playerMovement.y += player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.DOWN)) playerMovement.y -= player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
 		if(Gdx.input.isKeyPressed(Keys.A)) {
 			Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
 			Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
@@ -144,9 +148,9 @@ public class MyGdxGame extends ApplicationAdapter {
 							}
 						}
 					}
-					entities.removeIndex(i);
-					i--;
 				}
+				entities.removeIndex(i);
+				i--;
 			}
 		}
 	}

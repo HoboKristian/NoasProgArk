@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class GameState {
 	public static enum BoxType {OPEN, BOX, STONE, DOOR};
-	public static enum EntityType {BOMB, FLASH_BOMB, KEY, PLAYER};
+	public static enum EntityType {BOMB, FLASH_BOMB, KEY, PLAYER, POWERUP_WALK_FAST, POWERUP_WALK_WALL};
 	
 	public static int WIDTH;
 	public static int HEIGHT;
