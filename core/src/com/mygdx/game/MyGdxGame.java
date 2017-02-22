@@ -134,7 +134,8 @@ public class MyGdxGame extends ApplicationAdapter {
 					int by = (int)(bombPos.y / GameState.BLOCK_SIZE);
 					for (int x = bx - 1; x <= bx + 1; x++) {
 						for (int y = by - 1; y <= by + 1; y++) {
-							if (gameState.getTile(x, y).getType() == GameState.BoxType.BOX) {
+							Tile t = gameState.getTile(x, y);
+							if (t != null && t.getType() == GameState.BoxType.BOX) {
 								gameState.setTile(new Tile(new Vector2(x, y), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE), GameState.BoxType.OPEN), x, y);
 							}
 						}

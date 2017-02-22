@@ -57,14 +57,18 @@ public class GameState {
 	}
 	
 	public Tile getTile(int x, int y) {
-		if (x >= WIDTH || x < 0 || y >= HEIGHT || y < 0)
-			throw new IllegalArgumentException();
+		if (x >= WIDTH || x < 0 || y >= HEIGHT || y < 0) {
+			System.out.println("GetTile x,y must be within the gamestatemap");
+			return null;
+		}
 		return map[x][y];
 	}
 	
 	public void setTile(Tile t, int x, int y) throws IllegalArgumentException {
-		if (x >= WIDTH || x < 0 || y >= HEIGHT || y < 0)
-			throw new IllegalArgumentException();
+		if (x >= WIDTH || x < 0 || y >= HEIGHT || y < 0) {
+			System.out.println("SetTile x,y must be within the gamestatemap");
+			return;
+		}
 		map[x][y] = t;
 	}
 }
