@@ -34,6 +34,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		gameState = new GameState();
 		batch = new SpriteBatch();
 		player = new Player(GameState.BLOCK_SIZE * 2, GameState.BLOCK_SIZE * 2);
+		player.pos = new Vector2(4 * GameState.BLOCK_SIZE, 4 * GameState.BLOCK_SIZE);
 		backgroundImage = new Sprite(new Texture(Gdx.files.internal("bg_castle.png")));
 		float GAME_WIDTH = Gdx.graphics.getWidth();
 		float GAME_HEIGHT = Gdx.graphics.getHeight();
@@ -44,8 +45,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		cam.update();
 		
 		Door door = new Door(new Vector2(5 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE));
+		Key key = new Key(new Vector2(20, 20), new Vector2(2, 2), Tiles.getInstance().getTextureForType(GameState.EntityType.KEY));
 		gameState.setTile(door, 5, 9);
-		entities.add(new Key(new Vector2(20, 20), new Vector2(2, 2), Tiles.getInstance().getTextureForType(GameState.EntityType.KEY), door));
+		key.registerKeyListener(door);
+		entities.add(key);
 	}
 	
 	public void handleInput(Vector2 playerMovement) {

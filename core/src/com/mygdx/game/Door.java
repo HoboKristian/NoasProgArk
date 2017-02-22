@@ -2,8 +2,8 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class Door extends Tile {
-	boolean unlocked;
+public class Door extends Tile implements KeyListener{
+	private boolean unlocked;
 	public Door(Vector2 pos, Vector2 size) {
 		super(pos, size, GameState.BoxType.DOOR);
 		this.unlocked = false;
@@ -20,6 +20,11 @@ public class Door extends Tile {
 	public void update(float delta_t) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void keyUnlocked(Key key) {
+		this.unlocked = true;
 	}
 
 }
