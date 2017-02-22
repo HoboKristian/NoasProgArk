@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class Entity {
-	private Vector2 pos;
+	protected Vector2 pos;
 	private Vector2 size;
 	protected Texture texture;
 	
@@ -45,8 +45,9 @@ public abstract class Entity {
 	public Texture getTexture() {
 		return this.texture;
 	}
-	abstract public boolean shouldRemove();
-	abstract public void update(float delta_t);
+	
+	public boolean shouldRemove() {return false;}
+	public void update(float delta_t) {}
 	public void collide() {}
 
 }

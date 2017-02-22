@@ -6,7 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
-public class Key extends Entity {
+public class Key extends StaticEntity {
 	boolean taken;
 	private List<KeyListener> listeners = new ArrayList<>();
 	public Key(Vector2 pos, Vector2 size, Texture tex) {

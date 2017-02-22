@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameState.EntityType;
 
-public class Bomb extends Entity {
+public class Bomb extends StaticEntity {
 	Texture bombImg, flashImg;
 	
 	float timeToDetonate;

@@ -33,8 +33,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void create () {
 		gameState = new GameState();
 		batch = new SpriteBatch();
-		player = new Player(GameState.BLOCK_SIZE * 2, GameState.BLOCK_SIZE * 2);
-		player.pos = new Vector2(4 * GameState.BLOCK_SIZE, 4 * GameState.BLOCK_SIZE);
+		Vector2 playerPos = new Vector2(4 * GameState.BLOCK_SIZE, 4 * GameState.BLOCK_SIZE);
+		Vector2 playerSize = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+		player = new Player(playerPos, playerSize, Tiles.getInstance().getTextureForType(GameState.EntityType.PLAYER));
 		backgroundImage = new Sprite(new Texture(Gdx.files.internal("bg_castle.png")));
 		float GAME_WIDTH = Gdx.graphics.getWidth();
 		float GAME_HEIGHT = Gdx.graphics.getHeight();
@@ -64,8 +65,8 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 	
 	public void testPlayerMovement(Vector2 playerMovement) {
-		Rectangle playerRectX = player.getHitbox(); playerRectX.x += playerMovement.x;
-		Rectangle playerRectY = player.getHitbox(); playerRectY.y += playerMovement.y;
+		Rectangle playerRectX = player.getCollisionRectangle(); playerRectX.x += playerMovement.x;
+		Rectangle playerRectY = player.getCollisionRectangle(); playerRectY.y += playerMovement.y;
 		boolean blockedX = false;
 		boolean blockedY = false;
 		for (int x = 0; x < GameState.WIDTH; x++) {
@@ -91,7 +92,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 	
 	public void testEntityCollision() {
-		Rectangle playerRect = player.getHitbox();
+		Rectangle playerRect = player.getCollisionRectangle();
 		for (Entity e : entities) {
 			if (playerRect.overlaps(e.getCollisionRectangle())) {
 				e.collide();
@@ -151,8 +152,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 	
 	public void renderPlayer() {
-		Vector2 playerPos = player.getPos();
-		batch.draw(player.img(), (float)playerPos.x, (float)playerPos.y, GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+		this.batchDrawPosSize(batch, player.getTexture(), player.getPos(), player.getSize());
 	}
 	
 	@Override

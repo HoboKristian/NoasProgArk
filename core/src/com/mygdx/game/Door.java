@@ -17,12 +17,6 @@ public class Door extends Tile implements KeyListener{
 	}
 
 	@Override
-	public void update(float delta_t) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void keyUnlocked(Key key) {
 		this.unlocked = true;
 	}
