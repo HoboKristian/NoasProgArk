@@ -12,13 +12,16 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.Color;
 
 public class MyGdxGame extends ApplicationAdapter {
-	SpriteBatch batch;
+	SpriteBatch batch, hudBatch;
 	Sprite backgroundImage;
 	GameState gameState;
 	Player player;
 	Array<Entity> entities = new Array<Entity>();
+	
+	Hud hud;
 	
 	Texture bombImg, flashImg;
 	
@@ -30,15 +33,17 @@ public class MyGdxGame extends ApplicationAdapter {
 	static float GAME_HEIGHT;
 	
 	@Override
-	public void create () {
+	public void create() {
 		gameState = new GameState();
 		batch = new SpriteBatch();
+		hudBatch = new SpriteBatch();
+		hud = new Hud();
 		Vector2 playerPos = new Vector2(4 * GameState.BLOCK_SIZE, 4 * GameState.BLOCK_SIZE);
 		Vector2 playerSize = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
 		player = new Player(playerPos, playerSize, Tiles.getInstance().getTextureForType(GameState.EntityType.PLAYER));
 		backgroundImage = new Sprite(new Texture(Gdx.files.internal("bg_castle.png")));
-		float GAME_WIDTH = Gdx.graphics.getWidth();
-		float GAME_HEIGHT = Gdx.graphics.getHeight();
+		GAME_WIDTH = Gdx.graphics.getWidth();
+		GAME_HEIGHT = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(30, 30 * (GAME_HEIGHT / GAME_WIDTH));
 
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
@@ -160,7 +165,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 	
 	@Override
-	public void render () {
+	public void render() {
 		cam.update();
 		batch.setProjectionMatrix(cam.combined);
 		
@@ -180,6 +185,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		renderEntities();
 		renderPlayer();
 		batch.end();
+		
+		player.update(Gdx.graphics.getDeltaTime());
+		
+		hudBatch.begin();
+		Color powerupCol = Color.BLACK;
+		if (player.getPowerupClass() == PowerupWalkFaster.class)
+			powerupCol = Color.valueOf("#66ccFF");
+		hud.setPowerColor(powerupCol);
+		hud.setPowerSize(((int)(player.getPowerupDuration() * 30)));
+		hud.drawHud(hudBatch, GAME_WIDTH, GAME_HEIGHT);
+		hudBatch.end();
 	}
 	
 	@Override
