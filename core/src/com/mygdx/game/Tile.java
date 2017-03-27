@@ -7,7 +7,7 @@ public class Tile extends StaticEntity {
 	BoxType type;
 	
 	public Tile(Vector2 pos, Vector2 size, BoxType type) {
-		super(pos, size, Tiles.getInstance().getTextureForType(type));
+		super(pos, size, TextureLoader.getInstance().getTextureForType(type));
 		this.type = type;
 		// TODO Auto-generated constructor stub
 	}

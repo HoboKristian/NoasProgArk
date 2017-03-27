@@ -7,16 +7,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.game.GameState.BoxType;
 import com.mygdx.game.GameState.EntityType;
 
-public class Tiles {
+public class TextureLoader {
 	private static HashMap<BoxType, Texture> map = new HashMap<BoxType, Texture>();
 	private static HashMap<EntityType, Texture> entity = new HashMap<EntityType, Texture>();
-	private static final Tiles instance = new Tiles();
+	private static final TextureLoader instance = new TextureLoader();
 
-	public static Tiles getInstance(){
+	public static TextureLoader getInstance(){
 		return instance;
 	}
 	
-	private Tiles() {
+	private TextureLoader() {
 		map.put(BoxType.STONE, new Texture(Gdx.files.internal("Tiles/castleCenter.png")));
 		map.put(BoxType.BOX, new Texture(Gdx.files.internal("Tiles/box.png")));
 		map.put(BoxType.DOOR, new Texture(Gdx.files.internal("Tiles/boxExplosive.png")));

@@ -54,7 +54,6 @@ public class Player extends MoveableEntity implements PowerupListener{
 		if (powerup instanceof PowerupWalkFaster) {
 			this.velocity = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
 			powerupDuration = 5;
-			System.out.println("powerup");
 		}
 	}
 

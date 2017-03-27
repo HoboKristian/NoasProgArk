@@ -10,7 +10,7 @@ public class PowerupWalkFaster extends StaticEntity {
 	private boolean pickedUp;
 	
 	public PowerupWalkFaster(Vector2 pos, Vector2 size) {
-		super(pos, size, Tiles.getInstance().getTextureForType(GameState.EntityType.POWERUP_WALK_FAST));
+		super(pos, size, TextureLoader.getInstance().getTextureForType(GameState.EntityType.POWERUP_WALK_FAST));
 		this.pickedUp = false;
 		// TODO Auto-generated constructor stub
 	}
@@ -36,6 +36,8 @@ public class PowerupWalkFaster extends StaticEntity {
 	}
 	protected void notifyPowerupListeners (PowerupWalkFaster powerup) {
 		// Notify each of the listeners in the list of registered listeners
-		this.listeners.forEach(listener -> listener.powerupPickedUp(powerup));
+		for (PowerupListener listener : listeners) {
+			listener.powerupPickedUp(powerup);
+		}
 	}
 }

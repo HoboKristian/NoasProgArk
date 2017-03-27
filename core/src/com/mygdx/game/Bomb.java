@@ -16,8 +16,8 @@ public class Bomb extends StaticEntity {
 	
 	public Bomb(Vector2 pos, Vector2 size) {
 		super(pos, size);
-		bombImg = Tiles.getInstance().getTextureForType(EntityType.BOMB);
-		flashImg = Tiles.getInstance().getTextureForType(EntityType.FLASH_BOMB);
+		bombImg = TextureLoader.getInstance().getTextureForType(EntityType.BOMB);
+		flashImg = TextureLoader.getInstance().getTextureForType(EntityType.FLASH_BOMB);
 		detonating = true;
 		timeToDetonate = Bomb.BOMBTIMER;
 		timeToRemove = Bomb.FLASHTIMER;

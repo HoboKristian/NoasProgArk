@@ -41,7 +41,9 @@ public class Key extends StaticEntity {
 	}
 	protected void notifyKeyListeners (Key key) {
 		// Notify each of the listeners in the list of registered listeners
-		this.listeners.forEach(listener -> listener.keyUnlocked(key));
+		for (KeyListener listener : listeners) {
+			listener.keyUnlocked(key);
+		}
 	}
 
 }

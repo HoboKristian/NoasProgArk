@@ -5,9 +5,13 @@ import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 
 public class GameState {
@@ -16,25 +20,38 @@ public class GameState {
 	
 	public static int WIDTH;
 	public static int HEIGHT;
+
+	public Vector2 opponentPos = new Vector2(0, 0);
 	
 	public static int BLOCK_SIZE = 4;
 	
 	private Tile[][] map;
 	
-	public GameState() {
-		Path path = FileSystems.getDefault().getPath("map.txt");
-		try {
-			List<String> lines = Files.readAllLines(path);
-			Collections.reverse(lines);
-			HEIGHT = lines.size();
-			WIDTH = lines.get(0).split(" ").length;
-			map = new Tile[WIDTH][HEIGHT];
-			int y = 0;
-			for (String l : lines) {
-				int x = 0;
-				for (String a : l.split(" ")) {
-					BoxType b;
-					switch (Integer.parseInt(a)) {
+	private static final GameState instance = new GameState();
+
+	public String gameId;
+	public String name = "Kristian";
+	public static enum RenderState {GAME, MENU, LIST};
+	private RenderState renderState;
+	private List<GameStateListener> listeners = new ArrayList<GameStateListener>();
+
+	public static GameState getInstance(){
+		return instance;
+	}
+	
+	private GameState() {
+		FileHandle file = Gdx.files.internal("map.txt");
+		String text = file.readString();
+		String[] lines = text.split("\n");
+		HEIGHT = lines.length;
+		WIDTH = lines[0].split(" ").length;
+		map = new Tile[WIDTH][HEIGHT];
+		int y = 0;
+		for (String l : lines) {
+			int x = 0;
+			for (String a : l.split(" ")) {
+				BoxType b;
+				switch (Integer.parseInt(a)) {
 					case 0:
 						b = GameState.BoxType.OPEN;
 						break;
@@ -47,17 +64,13 @@ public class GameState {
 					default:
 						b = GameState.BoxType.OPEN;
 						break;
-					}
-					Vector2 pos = new Vector2(x * GameState.BLOCK_SIZE, y * GameState.BLOCK_SIZE);
-					Vector2 size = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
-					map[x][y] = new Tile(pos, size, b);
-					x++;
 				}
-				y++;
+				Vector2 pos = new Vector2(x * GameState.BLOCK_SIZE, y * GameState.BLOCK_SIZE);
+				Vector2 size = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
+				map[x][y] = new Tile(pos, size, b);
+				x++;
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			y++;
 		}
 	}
 	
@@ -76,4 +89,25 @@ public class GameState {
 		}
 		map[x][y] = t;
 	}
+
+	public void setRenderState(RenderState renderState) {
+		this.renderState = renderState;
+		notifyGameStateListeners(this.renderState);
+	}
+
+	public void registerGameStateListener (GameStateListener listener) {
+		// Add the listener to the list of registered listeners
+		this.listeners.add(listener);
+	}
+	public void unregisterGameStateListener (GameStateListener listener) {
+		// Remove the listener from the list of the registered listeners
+		this.listeners.remove(listener);
+	}
+	protected void notifyGameStateListeners (RenderState renderState) {
+		// Notify each of the listeners in the list of registered listeners
+		for (GameStateListener listener : listeners) {
+			listener.gameStateChanged(renderState);
+		}
+	}
 }
+

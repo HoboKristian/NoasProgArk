@@ -14,7 +14,7 @@ public class Hud {
 	private ShapeRenderer shapeRenderer;
 
 	public Hud() {
-		topRightTex = Tiles.getInstance().getTextureForType(GameState.EntityType.BOMB);
+		topRightTex = TextureLoader.getInstance().getTextureForType(GameState.EntityType.BOMB);
 		shapeRenderer = new ShapeRenderer();
 		powerSize = 100;
 		powerColor = Color.RED;
