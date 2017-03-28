@@ -8,10 +8,12 @@ public class Player extends MoveableEntity implements PowerupListener{
 	Vector2 velocity;
 	Class<?> powerupClass;
 	float powerupDuration = 0;
+	int numberOfBombs;
 	
 	public Player(Vector2 pos, Vector2 size, Texture tex) {
 		super(pos, size, tex);
 		this.velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
+		numberOfBombs = 3;
 	}
 	public void move(Vector2 movement) {
 		this.move(movement.x, movement.y);
@@ -57,4 +59,7 @@ public class Player extends MoveableEntity implements PowerupListener{
 		}
 	}
 
+	public int getNumberOfBombs(){
+		return getNumberOfBombs();
+	}
 }

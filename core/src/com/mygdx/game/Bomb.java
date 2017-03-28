@@ -21,6 +21,7 @@ public class Bomb extends StaticEntity {
 		detonating = true;
 		timeToDetonate = Bomb.BOMBTIMER;
 		timeToRemove = Bomb.FLASHTIMER;
+
 	}
 	
 	@Override

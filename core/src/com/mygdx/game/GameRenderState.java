@@ -55,7 +55,7 @@ public class GameRenderState extends RenderUpdateState {
         batch = new SpriteBatch();
         hudBatch = new SpriteBatch();
         hud = new Hud();
-        Vector2 playerPos = new Vector2(4 * GameState.BLOCK_SIZE, 4 * GameState.BLOCK_SIZE);
+        Vector2 playerPos = new Vector2(7 * GameState.BLOCK_SIZE, 2 * GameState.BLOCK_SIZE);
         Vector2 playerSize = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
         player = new Player(playerPos, playerSize, TextureLoader.getInstance().getTextureForType(GameState.EntityType.PLAYER));
         opponent = new Player(playerPos, playerSize, TextureLoader.getInstance().getTextureForType(GameState.EntityType.KEY));
@@ -70,7 +70,7 @@ public class GameRenderState extends RenderUpdateState {
 
         Door door = new Door(new Vector2(5 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE));
         Key key = new Key(new Vector2(20, 20), new Vector2(2, 2), TextureLoader.getInstance().getTextureForType(GameState.EntityType.KEY));
-        gameState.setTile(door, 5, 9);
+        gameState.setTile(door, 8, 12);
         key.registerKeyListener(door);
         entities.add(key);
 
@@ -108,9 +108,13 @@ public class GameRenderState extends RenderUpdateState {
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) playerMovement.y += player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) playerMovement.y -= player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
         if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
-            Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
-            entities.add(new Bomb(bombPos, bombSize));
+            if(player.getNumberOfBombs() > 0){
+                Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
+                Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
+                entities.add(new Bomb(bombPos, bombSize));
+                player.numberOfBombs--;
+
+            }
         }
     }
 
@@ -220,8 +224,8 @@ public class GameRenderState extends RenderUpdateState {
 
         opponent.setPos(GameState.getInstance().opponentPos);
         player.update(Gdx.graphics.getDeltaTime());
-        conn.sendPos(player.pos.x, player.pos.y, GameState.getInstance().gameId, GameState.getInstance().name);
-        conn.getGame(GameState.getInstance().gameId);
+        //conn.sendPos(player.pos.x, player.pos.y, GameState.getInstance().gameId, GameState.getInstance().name);
+        //conn.getGame(GameState.getInstance().gameId);
     }
 
     @Override

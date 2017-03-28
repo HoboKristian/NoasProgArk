@@ -15,7 +15,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 
 public class GameState {
-	public static enum BoxType {OPEN, BOX, STONE, DOOR};
+	public static enum BoxType {OPEN, BOX, STONE, DOOR, FLAG};
 	public static enum EntityType {BOMB, FLASH_BOMB, KEY, PLAYER, POWERUP_WALK_FAST, POWERUP_WALK_WALL};
 	
 	public static int WIDTH;
@@ -45,9 +45,13 @@ public class GameState {
 		String[] lines = text.split("\n");
 		HEIGHT = lines.length;
 		WIDTH = lines[0].split(" ").length;
+		String[] reversed_lines = new String[lines.length];
+		for (int i = 0; i < lines.length; i++) {
+			reversed_lines[i] = lines[lines.length - i - 1];
+		}
 		map = new Tile[WIDTH][HEIGHT];
 		int y = 0;
-		for (String l : lines) {
+		for (String l : reversed_lines) {
 			int x = 0;
 			for (String a : l.split(" ")) {
 				BoxType b;
@@ -60,6 +64,12 @@ public class GameState {
 						break;
 					case 2:
 						b = GameState.BoxType.STONE;
+						break;
+					case 3:
+						b = GameState.BoxType.FLAG;
+						break;
+					case 4:
+						b = GameState.BoxType.DOOR;
 						break;
 					default:
 						b = GameState.BoxType.OPEN;
