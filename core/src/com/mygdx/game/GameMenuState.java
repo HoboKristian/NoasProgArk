@@ -48,6 +48,7 @@ public class GameMenuState extends RenderUpdateState {
         BitmapFont font = new BitmapFont();
         font.getData().setScale(5);
         textButtonStyle.font = font;
+
         this.stage = new Stage(new ScreenViewport()); //Set up a stage for the ui
 
         this.logo = new Image(new Texture(Gdx.files.internal("mazerace.png")));

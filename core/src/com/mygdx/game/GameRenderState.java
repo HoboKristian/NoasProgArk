@@ -13,15 +13,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import com.badlogic.gdx.utils.Array;
@@ -54,6 +60,10 @@ public class GameRenderState extends RenderUpdateState {
     private Drawable touchKnob;
     Stage stage;
     ClientConnection conn;
+
+    TextButton.TextButtonStyle textButtonStyle; //dialog button
+    TextButton exitButton;
+    BitmapFont font;
 
 
     static float GAME_WIDTH;
@@ -89,6 +99,10 @@ public class GameRenderState extends RenderUpdateState {
         powerup.registerPowerupListener(player);
 
 
+        textButtonStyle = new TextButton.TextButtonStyle();
+        font = new BitmapFont();
+        font.getData().setScale(2);
+        textButtonStyle.font = font;
 
         //Create a touchpad skin
         touchpadSkin = new Skin();
@@ -107,7 +121,7 @@ public class GameRenderState extends RenderUpdateState {
         //Create new TouchPad with the created style
         touchpad = new Touchpad(10, touchpadStyle);
         //setBounds(x,y,width,height)
-        touchpad.setBounds(GAME_WIDTH-200, 15, 200, 200);
+        touchpad.setBounds(GAME_WIDTH-350, 50, 250, 250);
         //Create a Stage and add TouchPad
         stage = new Stage(new FillViewport(GAME_WIDTH, GAME_HEIGHT), batch);
         stage.addActor(touchpad);
@@ -165,8 +179,12 @@ public class GameRenderState extends RenderUpdateState {
 
 
     public void gameFinished(){
-        System.out.println("what");
+
+        this.exitButton = new TextButton("Exit to Menu", this.textButtonStyle); //Set the button up
+        this.exitButton.setBounds(600, 250, 400, 150);
+
         Skin skin = new Skin(Gdx.files.internal("Skin/uiskin.json"));
+
         final Dialog dialog = new Dialog("Winner", skin) {
 
             @Override
@@ -187,7 +205,32 @@ public class GameRenderState extends RenderUpdateState {
         dialog.setModal(true);
         dialog.setMovable(false);
         dialog.setResizable(false);
-        dialog.setBounds(500, 500, 500, 500);
+        dialog.setBounds(50, 50, 50, 50);
+        stage.addActor(dialog);
+
+        this.exitButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                GameState.getInstance().setRenderState(GameState.RenderState.MENU);
+            }
+        });
+
+
+        float btnSize = 80f;
+        Table t = new Table();
+        // t.debug();
+
+        //dialog.getContentTable().add(label1).padTop(40f);
+
+        t.add(exitButton).width(btnSize).height(btnSize);
+
+
+        dialog.getButtonTable().add(t).center().padBottom(80f);
+        dialog.show(stage).setPosition(
+                (GAME_WIDTH / 2) - (720 / 2),
+                (GAME_HEIGHT) - (GAME_HEIGHT - 40));
+
+        dialog.setName("quitDialog");
         stage.addActor(dialog);
 
     }
@@ -205,8 +248,8 @@ public class GameRenderState extends RenderUpdateState {
 
     public void clampCamera() {
         float BLOCK_PADDING = 1;
-        float playerX = player.getPos().x + GameState.BLOCK_SIZE / 2;
-        float playerY = player.getPos().y + GameState.BLOCK_SIZE / 2;
+        float playerX = player.getPos().x + GameState.BLOCK_SIZE/2;
+        float playerY = player.getPos().y + GameState.BLOCK_SIZE;
         cam.position.x = MathUtils.clamp(cam.position.x, playerX - GameState.BLOCK_SIZE * BLOCK_PADDING, playerX + GameState.BLOCK_SIZE * BLOCK_PADDING);
         cam.position.y = MathUtils.clamp(cam.position.y, playerY- GameState.BLOCK_SIZE * BLOCK_PADDING, playerY + GameState.BLOCK_SIZE * BLOCK_PADDING);
     }
