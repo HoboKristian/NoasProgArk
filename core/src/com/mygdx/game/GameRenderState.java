@@ -96,7 +96,7 @@ public class GameRenderState extends RenderUpdateState {
         //Create new TouchPad with the created style
         touchpad = new Touchpad(10, touchpadStyle);
         //setBounds(x,y,width,height)
-        touchpad.setBounds(15, 15, 200, 200);
+        touchpad.setBounds(GAME_WIDTH-200, 15, 200, 200);
         //Create a Stage and add TouchPad
         stage = new Stage(new FillViewport(GAME_WIDTH, GAME_HEIGHT), batch);
         stage.addActor(touchpad);
