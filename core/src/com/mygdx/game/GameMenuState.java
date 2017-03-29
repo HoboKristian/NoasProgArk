@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -36,14 +37,22 @@ public class GameMenuState extends RenderUpdateState {
     TextButton findPlayerButton;
     TextButton helpButton;
     TextButton lookingForPlayerButton;
+    Image logo;
+
 
     @Override
     public void init() {
+
         textButtonStyle = new TextButton.TextButtonStyle();
         BitmapFont font = new BitmapFont();
-        font.getData().setScale(4);
+        font.getData().setScale(5);
         textButtonStyle.font = font;
         this.stage = new Stage(new ScreenViewport()); //Set up a stage for the ui
+
+        this.logo = new Image(new Texture(Gdx.files.internal("mazerace.png")));
+        this.logo.setBounds(850, 300, 500, 500);
+        this.stage.addActor(this.logo);
+
 
         this.helpButton = new TextButton("Help", this.textButtonStyle); //Set the button up
         this.helpButton.setBounds(200, 200, 400, 150);
@@ -81,10 +90,11 @@ public class GameMenuState extends RenderUpdateState {
     public void render() {
         Gdx.input.setInputProcessor(stage); //Start taking input from the ui
 
-        Gdx.gl.glClearColor(0.7f, 0.7f, 0.7f, 1);
+        Gdx.gl.glClearColor(0.7f, 0.8f, 0.7f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.act(Gdx.graphics.getDeltaTime()); //Perform ui logic
+
         stage.draw(); //Draw the ui
     }
 
