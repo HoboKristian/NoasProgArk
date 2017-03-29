@@ -68,9 +68,6 @@ public class GameState {
 					case 3:
 						b = GameState.BoxType.FLAG;
 						break;
-					case 4:
-						b = GameState.BoxType.DOOR;
-						break;
 					default:
 						b = GameState.BoxType.OPEN;
 						break;
@@ -99,6 +96,8 @@ public class GameState {
 		}
 		map[x][y] = t;
 	}
+
+
 
 	public void setRenderState(RenderState renderState) {
 		this.renderState = renderState;

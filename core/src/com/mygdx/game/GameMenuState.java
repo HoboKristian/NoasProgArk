@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -54,6 +55,7 @@ public class GameMenuState extends RenderUpdateState {
         this.stage.addActor(this.logo);
 
 
+
         this.helpButton = new TextButton("Help", this.textButtonStyle); //Set the button up
         this.helpButton.setBounds(200, 200, 400, 150);
         this.stage.addActor(this.helpButton); //Add the button to the stage to perform rendering and take input.
@@ -94,7 +96,6 @@ public class GameMenuState extends RenderUpdateState {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.act(Gdx.graphics.getDeltaTime()); //Perform ui logic
-
         stage.draw(); //Draw the ui
     }
 
