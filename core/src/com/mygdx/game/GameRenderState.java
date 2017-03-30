@@ -7,15 +7,29 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
@@ -33,6 +47,7 @@ public class GameRenderState extends RenderUpdateState {
     Player player, opponent;
     Array<Entity> entities = new Array<Entity>();
 
+
     Hud hud;
 
     Texture bombImg, flashImg;
@@ -49,6 +64,11 @@ public class GameRenderState extends RenderUpdateState {
     Stage stage;
     ClientConnection conn;
 
+    TextButton.TextButtonStyle textButtonStyle; //dialog button
+    TextButton exitButton;
+    BitmapFont font;
+
+
     static float GAME_WIDTH;
     static float GAME_HEIGHT;
 
@@ -58,7 +78,7 @@ public class GameRenderState extends RenderUpdateState {
         batch = new SpriteBatch();
         hudBatch = new SpriteBatch();
         hud = new Hud();
-        Vector2 playerPos = new Vector2(7 * GameState.BLOCK_SIZE, 2 * GameState.BLOCK_SIZE);
+        Vector2 playerPos = new Vector2(9 * GameState.BLOCK_SIZE, 2 * GameState.BLOCK_SIZE);
         Vector2 playerSize = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
         player = new Player(playerPos, playerSize, TextureLoader.getInstance().getTextureForType(GameState.EntityType.PLAYER));
         opponent = new Player(playerPos, playerSize, TextureLoader.getInstance().getTextureForType(GameState.EntityType.KEY));
@@ -71,21 +91,26 @@ public class GameRenderState extends RenderUpdateState {
         cam.zoom = 1.0f;
         cam.update();
 
-        Door door = new Door(new Vector2(5 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE));
-        Key key = new Key(new Vector2(20, 20), new Vector2(2, 2), TextureLoader.getInstance().getTextureForType(GameState.EntityType.KEY));
-        gameState.setTile(door, 8, 12);
+        Door door = new Door(new Vector2(9 * GameState.BLOCK_SIZE, 21 * GameState.BLOCK_SIZE), new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE));
+        Key key = new Key(new Vector2(6 * GameState.BLOCK_SIZE, 18 * GameState.BLOCK_SIZE), new Vector2(2, 2), TextureLoader.getInstance().getTextureForType(GameState.EntityType.KEY));
+        gameState.setTile(door, 9, 20);
         key.registerKeyListener(door);
         entities.add(key);
 
-        PowerupWalkFaster powerup = new PowerupWalkFaster(new Vector2(24, 28), new Vector2(2, 2));
+        PowerupWalkFaster powerup = new PowerupWalkFaster(new Vector2(12 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(3, 3));
         entities.add(powerup);
         powerup.registerPowerupListener(player);
 
 
+        textButtonStyle = new TextButton.TextButtonStyle();
+        font = new BitmapFont();
+        font.getData().setScale(2);
+        textButtonStyle.font = font;
+
         //Create a touchpad skin
         touchpadSkin = new Skin();
         //Set background image
-        touchpadSkin.add("touchBackground", new Texture(Gdx.files.internal("Touchpad/touchBackground.png")));
+        touchpadSkin.add("touchBackground", new Texture(Gdx.files.internal("Touchpad/bigball.png")));
         //Set knob image
         touchpadSkin.add("touchKnob", new Texture(Gdx.files.internal("Touchpad/touchKnob.png")));
         //Create TouchPad Style
@@ -99,7 +124,7 @@ public class GameRenderState extends RenderUpdateState {
         //Create new TouchPad with the created style
         touchpad = new Touchpad(10, touchpadStyle);
         //setBounds(x,y,width,height)
-        touchpad.setBounds(GAME_WIDTH-200, 15, 200, 200);
+        touchpad.setBounds(GAME_WIDTH-350, 50, 250, 250);
         //Create a Stage and add TouchPad
         stage = new Stage(new FillViewport(GAME_WIDTH, GAME_HEIGHT), batch);
         stage.addActor(touchpad);
@@ -131,13 +156,20 @@ public class GameRenderState extends RenderUpdateState {
         for (int x = 0; x < GameState.WIDTH; x++) {
             for (int y = 0; y < GameState.HEIGHT; y++) {
                 Tile t = gameState.getTile(x, y);
-                if (t.getType() == GameState.BoxType.OPEN) continue;
+
+                if (t.getType() == GameState.BoxType.OPEN){
+                    continue;
+                }
 
                 Rectangle box = t.getCollisionRectangle();
                 if (box.overlaps(playerRectX)) {
                     blockedX = true;
                 } if (box.overlaps(playerRectY)) {
                     blockedY = true;
+                }
+
+                if(t.getType() == GameState.BoxType.FLAG && box.overlaps(playerRectY)){
+                    gameFinished();
                 }
             }
             if (blockedX && blockedY)
@@ -150,6 +182,66 @@ public class GameRenderState extends RenderUpdateState {
             player.move(0, playerMovement.y);
     }
 
+
+    public void gameFinished(){
+
+        this.exitButton = new TextButton("Exit to Menu", this.textButtonStyle); //Set the button up
+        this.exitButton.setBounds(600, 250, 400, 150);
+
+        Skin skin = new Skin(Gdx.files.internal("Skin/uiskin.json"));
+
+        final Dialog dialog = new Dialog("Winner", skin) {
+
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                // return Gdx.graphics.getWidth() / 2;
+                return 700f;
+            }
+
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                // return Gdx.graphics.getWidth() / 2;
+                return 400f;
+            }
+        };
+
+        dialog.setModal(true);
+        dialog.setMovable(false);
+        dialog.setResizable(false);
+        dialog.setBounds(50, 50, 50, 50);
+        stage.addActor(dialog);
+
+        this.exitButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                GameState.getInstance().setRenderState(GameState.RenderState.MENU);
+            }
+        });
+
+
+        float btnSize = 80f;
+        Table t = new Table();
+        // t.debug();
+
+        //dialog.getContentTable().add(label1).padTop(40f);
+
+        t.add(exitButton).width(btnSize).height(btnSize);
+
+
+        dialog.getButtonTable().add(t).center().padBottom(80f);
+        dialog.show(stage).setPosition(
+                (GAME_WIDTH / 2) - (720 / 2),
+                (GAME_HEIGHT) - (GAME_HEIGHT - 40));
+
+        dialog.setName("quitDialog");
+        stage.addActor(dialog);
+
+    }
+
+
+
     public void testEntityCollision() {
         Rectangle playerRect = player.getCollisionRectangle();
         for (Entity e : entities) {
@@ -161,8 +253,8 @@ public class GameRenderState extends RenderUpdateState {
 
     public void clampCamera() {
         float BLOCK_PADDING = 1;
-        float playerX = player.getPos().x + GameState.BLOCK_SIZE / 2;
-        float playerY = player.getPos().y + GameState.BLOCK_SIZE / 2;
+        float playerX = player.getPos().x + GameState.BLOCK_SIZE/2;
+        float playerY = player.getPos().y + GameState.BLOCK_SIZE;
         cam.position.x = MathUtils.clamp(cam.position.x, playerX - GameState.BLOCK_SIZE * BLOCK_PADDING, playerX + GameState.BLOCK_SIZE * BLOCK_PADDING);
         cam.position.y = MathUtils.clamp(cam.position.y, playerY- GameState.BLOCK_SIZE * BLOCK_PADDING, playerY + GameState.BLOCK_SIZE * BLOCK_PADDING);
     }
@@ -264,7 +356,7 @@ public class GameRenderState extends RenderUpdateState {
 
         batch.setProjectionMatrix(cam.combined);
 
-        Gdx.gl.glClearColor(0.7f, 0.7f, 0.7f, 1);
+        Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 0.2f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();

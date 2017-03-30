@@ -16,7 +16,7 @@ public class Hud {
 	public Hud() {
 		topRightTex = TextureLoader.getInstance().getTextureForType(GameState.EntityType.BOMB);
 		shapeRenderer = new ShapeRenderer();
-		powerSize = 100;
+		powerSize = 300;
 		powerColor = Color.RED;
 	}
 	
@@ -30,16 +30,16 @@ public class Hud {
 	
 	public void drawHud(SpriteBatch batch, float gameWidth, float gameHeight) {
 		for (int i = 0; i < topRightCount; i++)
-			batch.draw(topRightTex, 20 + i * 30, gameHeight - 40, 30, 30);
+			batch.draw(topRightTex, 15+(i*80), 30, 80, 80);
 
 		if (powerSize > 0) {
 			batch.end();
 			shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 			shapeRenderer.begin(ShapeType.Filled);
-			int powerupHeight = 16;
+			int powerupHeight = 40;
 
 			shapeRenderer.setColor(Color.valueOf("0099e6"));
-			this.drawRoundedRect(200, gameHeight - 41, this.powerSize + 2, powerupHeight + 2);
+			this.drawRoundedRect((gameWidth/2)-this.powerSize, gameHeight - 71, this.powerSize + 2, powerupHeight + 2);
 			
 			/*shapeRenderer.setColor(Color.valueOf("444444"));
 			this.drawRoundedRect(202, gameHeight - 42, this.powerSize, powerupHeight);
@@ -47,8 +47,8 @@ public class Hud {
 			shapeRenderer.setColor(Color.valueOf("555555"));
 			this.drawRoundedRect(203, gameHeight - 43, this.powerSize, powerupHeight);
 			*/
-			shapeRenderer.setColor(powerColor);
-			this.drawRoundedRect(200, gameHeight - 40, this.powerSize, powerupHeight);
+			shapeRenderer.setColor(Color.valueOf("33abe8"));
+			this.drawRoundedRect((gameWidth/2)-this.powerSize, gameHeight - 69, this.powerSize, powerupHeight);
 
 			
 			shapeRenderer.end();

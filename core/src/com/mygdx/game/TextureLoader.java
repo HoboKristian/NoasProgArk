@@ -19,13 +19,13 @@ public class TextureLoader {
 	private TextureLoader() {
 		map.put(BoxType.STONE, new Texture(Gdx.files.internal("Tiles/castleCenter.png")));
 		map.put(BoxType.BOX, new Texture(Gdx.files.internal("Tiles/box.png")));
-		map.put(BoxType.DOOR, new Texture(Gdx.files.internal("Tiles/boxExplosive.png")));
-		map.put(BoxType.FLAG, new Texture(Gdx.files.internal("Items/flagBlue.png")));
+		map.put(BoxType.DOOR, new Texture(Gdx.files.internal("Tiles/door.png")));
+		map.put(BoxType.FLAG, new Texture(Gdx.files.internal("Items/goal.png")));
 
-		entity.put(EntityType.BOMB, new Texture(Gdx.files.internal("Items/bomb.png")));
+		entity.put(EntityType.BOMB, new Texture(Gdx.files.internal("Items/darkbomb.png")));
 		entity.put(EntityType.FLASH_BOMB, new Texture(Gdx.files.internal("Items/bombFlash.png")));
 		entity.put(EntityType.KEY, new Texture(Gdx.files.internal("Items/keyYellow.png")));
-		entity.put(EntityType.PLAYER, new Texture(Gdx.files.internal("Player/p3_front.png")));
+		entity.put(EntityType.PLAYER, new Texture(Gdx.files.internal("Player/p1_front.png")));
 		entity.put(EntityType.POWERUP_WALK_FAST, new Texture(Gdx.files.internal("Items/gemBlue.png")));
 		entity.put(EntityType.POWERUP_WALK_WALL, new Texture(Gdx.files.internal("Items/gemYellow.png")));
 	}
