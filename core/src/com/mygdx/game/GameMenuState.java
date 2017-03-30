@@ -26,6 +26,9 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by kristianflatheimjensen on 23/03/2017.
  */
@@ -45,16 +48,20 @@ public class GameMenuState extends RenderUpdateState {
         textButtonStyle.font = font;
         this.stage = new Stage(new ScreenViewport()); //Set up a stage for the ui
 
+        //this.logo = new Image(new Texture(Gdx.files.internal("mazerace.png")));
+        //this.logo.setBounds(850, 300, 500, 500);
+        //this.stage.addActor(this.logo);
+
         this.helpButton = new TextButton("Help", this.textButtonStyle); //Set the button up
-        this.helpButton.setBounds(200, 200, 400, 150);
+        this.helpButton.setBounds(200, 000, 400, 75);
         this.stage.addActor(this.helpButton); //Add the button to the stage to perform rendering and take input.
 
         this.findPlayerButton = new TextButton("Find", this.textButtonStyle); //Set the button up
-        this.findPlayerButton.setBounds(200, 500, 400, 150);
+        this.findPlayerButton.setBounds(200, 100, 400, 75);
         this.stage.addActor(this.findPlayerButton); //Add the button to the stage to perform rendering and take input.
 
         this.lookingForPlayerButton = new TextButton("Looking", this.textButtonStyle); //Set the button up
-        this.lookingForPlayerButton.setBounds(200, 800, 400, 150);
+        this.lookingForPlayerButton.setBounds(200, 200, 400, 75);
         this.stage.addActor(this.lookingForPlayerButton); //Add the button to the stage to perform rendering and take input.
 
         this.helpButton.addListener(new ChangeListener() {
@@ -72,7 +79,17 @@ public class GameMenuState extends RenderUpdateState {
         this.lookingForPlayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ClientConnection.getInstance().registerLookingForGame(GameState.getInstance().name);
+                ClientConnection.getInstance().registerLookingForGame(GameState.getInstance().name, new GameHTTPResponse() {
+                    @Override
+                    public void result(JSONObject result) {
+                        try {
+                            GameState.getInstance().gameId = result.getString("gameid");
+                            GameState.getInstance().setRenderState(GameState.RenderState.GAME);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
     }

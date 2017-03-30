@@ -22,6 +22,10 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by kristianflatheimjensen on 24/03/2017.
  */
@@ -36,11 +40,17 @@ public class GameListState extends RenderUpdateState {
         ClientConnection conn = ClientConnection.getInstance();
         conn.getAvailablePlayers(new GameHTTPResponse() {
             @Override
-            public void result(String result) {
-                JsonReader json = new JsonReader();
-                JsonValue base = json.parse(result);
-                players = base.get("players").asStringArray();
-                addButtons();
+            public void result(JSONObject result) {
+                try {
+                    JSONArray arr = result.getJSONArray("players");
+                    String[] s = new String[arr.length()];
+                    for (int i = 0; i < arr.length(); i++)
+                        s[i] = arr.getString(i);
+                    players = s;
+                    addButtons();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
         textButtonStyle = new TextButton.TextButtonStyle();
@@ -77,15 +87,26 @@ public class GameListState extends RenderUpdateState {
             String p = players[i];
             System.out.println("dfsdfsdf " + p);
             TextButton button = new TextButton(p, textButtonStyle); //Set the button up
-            button.setBounds(100, 100 * (i+1), 200, 75);
+            button.setBounds(0, 0 + 100 * (i+1), 200, 75);
             stage.addActor(button); //Add the button to the stage to perform rendering and take input.
 
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     ClientConnection conn = ClientConnection.getInstance();
-                    conn.createGameWith("Kristian", p);
-                    System.out.println(p);
+                    conn.createGameWith("Kristian", p, new GameHTTPResponse() {
+                        @Override
+                        public void result(JSONObject result) {
+                            try {
+                                GameState.getInstance().gameId = result.getString("gameid");
+                                GameState.getInstance().setRenderState(GameState.RenderState.GAME);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            System.out.println("gameid");
+                        }
+                    });
+                    System.out.println("creategamE" + p);
                 }
             });
         }

@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.math.Vector2;
@@ -10,14 +11,22 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.OrderedMap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
 import java.util.Dictionary;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * Created by kristianflatheimjensen on 22/03/2017.
  */
 
 interface GameHTTPResponse {
-    void result(String result);
+    void result(JSONObject result);
 }
 
 public class ClientConnection {
@@ -29,7 +38,16 @@ public class ClientConnection {
     }
 
     private String base_uri;
+    Socket socket;
+
     private ClientConnection() {
+        try {
+            socket = IO.socket("http://localhost:5005");
+            socket.connect();
+        } catch (URISyntaxException e1) {
+            e1.printStackTrace();
+        }
+
         String base_url = "10.0.2.2";
         String base_port = "5005";
         String base_api_path = "api/";
@@ -37,109 +55,93 @@ public class ClientConnection {
     }
 
     public void getAvailablePlayers(GameHTTPResponse response) {
-        String URL = this.base_uri + "player";
-        this.sendHTTPRequest("", URL, response);
-    }
-
-    public void registerLookingForGame(String name) {
-        String content = String.format("name=%s", name);
-        String URL = this.base_uri + "register";
-        this.sendHTTPRequest(content, URL, new GameHTTPResponse() {
+        System.out.println("connect");
+        socket.emit("players", new JSONObject());
+        socket.on("players", new Emitter.Listener() {
             @Override
-            public void result(String result) {
-                idleWaitForOpponent(name);
-            }
-        });
-    }
-
-    public void createGameWith(String name, String opponent) {
-        String content = String.format("player1=%s&player2=%s", name, opponent);
-        String URL = this.base_uri + "creategame";
-        this.sendHTTPRequest(content, URL, new GameHTTPResponse() {
-            @Override
-            public void result(String result) {
-                JsonReader json = new JsonReader();
-                JsonValue base = json.parse(result);
-
-                GameState gameState = GameState.getInstance();
-                gameState.gameId = base.getString("gameid");
-                gameState.setRenderState(GameState.RenderState.GAME);
-            }
-        });
-    }
-
-    public void getGame(String id) {
-        String URL = this.base_uri + "game/" + id;
-        this.sendHTTPRequest("", URL, new GameHTTPResponse() {
-            @Override
-            public void result(String result) {
-                JsonReader json = new JsonReader();
-                JsonValue base = json.parse(result);
-
-                JsonValue player1 = base.get("1");
-                float xpos = player1.getFloat("xpos");
-                float ypos = player1.getFloat("ypos");
-                GameState.getInstance().opponentPos = new Vector2(xpos, ypos);
-            }
-        });
-    }
-
-    public void sendPos(float xpos, float ypos, String gameId, String name) {
-        String content = String.format("xpos=%f&ypos=%f", xpos, ypos);
-        String URL = String.format("%s%s/%s/%s", this.base_uri, "game/", gameId, name);
-        this.sendHTTPRequest(content, URL, new GameHTTPResponse() {
-            @Override
-            public void result(String result) {
-                Json json = new Json();
-                json.prettyPrint(result);
-            }
-        });
-    }
-
-    private void idleWaitForOpponent(String name) {
-        String content = String.format("name=", name);
-        String URL = String.format("%s%s", this.base_uri, "opponent");
-        this.sendHTTPRequest(content, URL, new GameHTTPResponse() {
-            @Override
-            public void result(String result) {
-                JsonReader json = new JsonReader();
-                JsonValue base = json.parse(result);
-                boolean found = base.get("found").asBoolean();
-                if (!found)
-                    idleWaitForOpponent(name);
-                else {
-                    String gameid = base.get("gameid").asString();
-
-                    GameState gameState = GameState.getInstance();
-                    gameState.gameId = base.getString("gameid");
-                    gameState.setRenderState(GameState.RenderState.GAME);
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                System.out.println("players");
+                try {
+                    response.result(obj);
+                    System.out.println("playing against: " + obj.getJSONArray("players").toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
-    private void sendHTTPRequest(String content, String URL, GameHTTPResponse response) {
-        HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
-        Net.HttpRequest httpRequest = requestBuilder.newRequest()
-                .method(Net.HttpMethods.GET)
-                .url(URL)
-                .content(content)
-                .build();
-        Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
-            public void cancelled() {}
-            public void failed(java.lang.Throwable t) {}
-            public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                response.result(httpResponse.getResultAsString());
+    public void registerLookingForGame(String name, GameHTTPResponse reponse) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("name", GameState.getInstance().name);
+            socket.emit("lookingforplayer", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.on("opponentfound", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                reponse.result(obj);
             }
         });
     }
-}
 
-class GameResponse {
-    public OrderedMap<String, PlayerResponse> players;
-}
+    public void createGameWith(String name, String opponent, GameHTTPResponse response) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("player1", GameState.getInstance().name);
+            obj.put("player2", opponent);
+            socket.emit("creategame", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.on("creategame", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                response.result(obj);
+            }
+        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {}
+        });
+    }
 
-class PlayerResponse {
-    public int x_pos;
-    public int y_pos;
+    public void getGame(String gameId, GameHTTPResponse response) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("gameid", gameId);
+            socket.emit("getgame", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.on("getgame", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                response.result(obj);
+            }
+        });
+    }
+
+    public void sendPos(float xpos, float ypos, String gameId, String name) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("player", name);
+            obj.put("gameid", gameId);
+            obj.put("xpos", xpos);
+            obj.put("ypos", ypos);
+            socket.emit("setpos", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+            }
+        });
+    }
 }
