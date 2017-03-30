@@ -19,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by kristianflatheimjensen on 23/03/2017.
  */
@@ -100,6 +103,8 @@ public class GameRenderState extends RenderUpdateState {
         //Create a Stage and add TouchPad
         stage = new Stage(new FillViewport(GAME_WIDTH, GAME_HEIGHT), batch);
         stage.addActor(touchpad);
+
+        conn = ClientConnection.getInstance();
     }
 
     public void handleInput(Vector2 playerMovement) {
@@ -222,10 +227,35 @@ public class GameRenderState extends RenderUpdateState {
 
         clampCamera();
 
-        opponent.setPos(GameState.getInstance().opponentPos);
         player.update(Gdx.graphics.getDeltaTime());
-        //conn.sendPos(player.pos.x, player.pos.y, GameState.getInstance().gameId, GameState.getInstance().name);
-        //conn.getGame(GameState.getInstance().gameId);
+        conn.sendPos(player.pos.x, player.pos.y, GameState.getInstance().gameId, GameState.getInstance().name);
+        conn.getGame(GameState.getInstance().gameId, new GameHTTPResponse() {
+            @Override
+            public void result(JSONObject result) {
+                try {
+                    String player1 = result.getString("player1");
+                    String player2 = result.getString("player2");
+                    JSONObject posObj;
+
+
+                    if (GameState.getInstance().name.matches(player1)) {
+                        posObj = result.getJSONObject("2");
+                    } else {
+                        posObj = result.getJSONObject("1");
+                    }
+
+//                    System.out.println(player1 + " " + player2 + " " + GameState.getInstance().name);
+//                    System.out.println(posObj);
+
+                    float xpos = (float)posObj.getDouble("xpos");
+                    float ypos = (float)posObj.getDouble("ypos");
+
+                    opponent.setPos(new Vector2(xpos, ypos));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

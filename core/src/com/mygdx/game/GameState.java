@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -30,7 +31,7 @@ public class GameState {
 	private static final GameState instance = new GameState();
 
 	public String gameId;
-	public String name = "Kristian";
+	public String name = getSaltString();
 	public static enum RenderState {GAME, MENU, LIST};
 	private RenderState renderState;
 	private List<GameStateListener> listeners = new ArrayList<GameStateListener>();
@@ -38,7 +39,20 @@ public class GameState {
 	public static GameState getInstance(){
 		return instance;
 	}
-	
+
+	protected String getSaltString() {
+		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		StringBuilder salt = new StringBuilder();
+		Random rnd = new Random();
+		while (salt.length() < 18) {
+			int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+			salt.append(SALTCHARS.charAt(index));
+		}
+		String saltStr = salt.toString();
+		return saltStr;
+
+	}
+
 	private GameState() {
 		FileHandle file = Gdx.files.internal("map.txt");
 		String text = file.readString();
