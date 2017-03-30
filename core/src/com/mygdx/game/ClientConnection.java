@@ -42,7 +42,9 @@ public class ClientConnection {
 
     private ClientConnection() {
         try {
-            socket = IO.socket("http://localhost:5005");
+            //socket = IO.socket("http://localhost:5005");
+            socket = IO.socket("http://10.0.2.2:5005");
+
             socket.connect();
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
