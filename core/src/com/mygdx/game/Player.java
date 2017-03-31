@@ -60,6 +60,6 @@ public class Player extends MoveableEntity implements PowerupListener{
 	}
 
 	public int getNumberOfBombs(){
-		return getNumberOfBombs();
+		return this.numberOfBombs;
 	}
 }

@@ -31,10 +31,13 @@ public class GameState {
 	private static final GameState instance = new GameState();
 
 	public String gameId;
+	public String gameWinner;
+	public boolean gameFinished;
 	public String name = getSaltString();
+
 	public static enum RenderState {GAME, MENU, LIST};
 	private RenderState renderState;
-	private List<GameStateListener> listeners = new ArrayList<GameStateListener>();
+	private List<GameStateListener> statelisteners = new ArrayList<GameStateListener>();
 
 	public static GameState getInstance(){
 		return instance;
@@ -111,24 +114,27 @@ public class GameState {
 		map[x][y] = t;
 	}
 
-
-
 	public void setRenderState(RenderState renderState) {
 		this.renderState = renderState;
 		notifyGameStateListeners(this.renderState);
 	}
 
+	public void setGameFinished(String winner) {
+		this.gameFinished = true;
+		this.gameWinner = winner;
+	}
+
 	public void registerGameStateListener (GameStateListener listener) {
 		// Add the listener to the list of registered listeners
-		this.listeners.add(listener);
+		this.statelisteners.add(listener);
 	}
 	public void unregisterGameStateListener (GameStateListener listener) {
 		// Remove the listener from the list of the registered listeners
-		this.listeners.remove(listener);
+		this.statelisteners.remove(listener);
 	}
 	protected void notifyGameStateListeners (RenderState renderState) {
 		// Notify each of the listeners in the list of registered listeners
-		for (GameStateListener listener : listeners) {
+		for (GameStateListener listener : this.statelisteners) {
 			listener.gameStateChanged(renderState);
 		}
 	}

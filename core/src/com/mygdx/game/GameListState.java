@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -34,10 +35,19 @@ public class GameListState extends RenderUpdateState {
     String[] players = {"Kristian", "Synne", "Marianne"};
     TextButton.TextButtonStyle textButtonStyle;
     Stage stage;
+    ClientConnection conn;
 
     @Override
     public void init() {
-        ClientConnection conn = ClientConnection.getInstance();
+        conn = ClientConnection.getInstance();
+        textButtonStyle = new TextButton.TextButtonStyle();
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(4);
+        textButtonStyle.font = font;
+        stage = new Stage(new ScreenViewport()); //Set up a stage for the ui
+    }
+
+    public void getsFocus() {
         conn.getAvailablePlayers(new GameHTTPResponse() {
             @Override
             public void result(JSONObject result) {
@@ -53,12 +63,6 @@ public class GameListState extends RenderUpdateState {
                 }
             }
         });
-        textButtonStyle = new TextButton.TextButtonStyle();
-        BitmapFont font = new BitmapFont();
-        font.getData().setScale(4);
-        textButtonStyle.font = font;
-        stage = new Stage(new ScreenViewport()); //Set up a stage for the ui
-        //addButtons();
     }
 
     @Override
@@ -85,7 +89,9 @@ public class GameListState extends RenderUpdateState {
     private void addButtons() {
         for (int i = 0; i < players.length; i++) {
             String p = players[i];
-            System.out.println("dfsdfsdf " + p);
+            if (p.equals(GameState.getInstance().name))
+                continue;
+
             TextButton button = new TextButton(p, textButtonStyle); //Set the button up
             button.setBounds(0, 0 + 100 * (i+1), 200, 75);
             stage.addActor(button); //Add the button to the stage to perform rendering and take input.

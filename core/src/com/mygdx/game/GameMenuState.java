@@ -40,13 +40,10 @@ public class GameMenuState extends RenderUpdateState {
     Stage stage;
     TextButton findPlayerButton;
     TextButton helpButton;
-    TextButton lookingForPlayerButton;
     Image logo;
-
 
     @Override
     public void init() {
-
         textButtonStyle = new TextButton.TextButtonStyle();
         BitmapFont font = new BitmapFont();
         font.getData().setScale(5);
@@ -66,10 +63,6 @@ public class GameMenuState extends RenderUpdateState {
         this.findPlayerButton.setBounds(200, 100, 400, 75);
         this.stage.addActor(this.findPlayerButton); //Add the button to the stage to perform rendering and take input.
 
-        this.lookingForPlayerButton = new TextButton("Looking", this.textButtonStyle); //Set the button up
-        this.lookingForPlayerButton.setBounds(200, 200, 400, 75);
-        this.stage.addActor(this.lookingForPlayerButton); //Add the button to the stage to perform rendering and take input.
-
         this.helpButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -82,22 +75,10 @@ public class GameMenuState extends RenderUpdateState {
                 GameState.getInstance().setRenderState(GameState.RenderState.LIST);
             }
         });
-        this.lookingForPlayerButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ClientConnection.getInstance().registerLookingForGame(GameState.getInstance().name, new GameHTTPResponse() {
-                    @Override
-                    public void result(JSONObject result) {
-                        try {
-                            GameState.getInstance().gameId = result.getString("gameid");
-                            GameState.getInstance().setRenderState(GameState.RenderState.GAME);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-        });
+    }
+
+    public void getsFocus() {
+
     }
 
     @Override

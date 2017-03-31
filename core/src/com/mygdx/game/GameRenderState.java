@@ -124,7 +124,7 @@ public class GameRenderState extends RenderUpdateState {
         //Create new TouchPad with the created style
         touchpad = new Touchpad(10, touchpadStyle);
         //setBounds(x,y,width,height)
-        touchpad.setBounds(GAME_WIDTH-350, 50, 250, 250);
+        touchpad.setBounds(GAME_WIDTH - 350, 50, 250, 250);
         //Create a Stage and add TouchPad
         stage = new Stage(new FillViewport(GAME_WIDTH, GAME_HEIGHT), batch);
         stage.addActor(touchpad);
@@ -132,44 +132,66 @@ public class GameRenderState extends RenderUpdateState {
         conn = ClientConnection.getInstance();
     }
 
+    public void getsFocus() {
+        conn.registerWinnerCallback(new GameHTTPResponse() {
+            @Override
+            public void result(JSONObject result) {
+                try {
+                    GameState.getInstance().setGameFinished(result.getString("winner"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     public void handleInput(Vector2 playerMovement) {
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) playerMovement.x -= player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) playerMovement.x += player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)) playerMovement.y += player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) playerMovement.y -= player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            if(player.getNumberOfBombs() > 0){
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+            playerMovement.x -= player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+            playerMovement.x += player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+            playerMovement.y += player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            playerMovement.y -= player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            if (player.getNumberOfBombs() > 0) {
                 Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
                 Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
                 entities.add(new Bomb(bombPos, bombSize));
                 player.numberOfBombs--;
-
             }
         }
     }
 
     public void testPlayerMovement(Vector2 playerMovement) {
-        Rectangle playerRectX = player.getCollisionRectangle(); playerRectX.x += playerMovement.x;
-        Rectangle playerRectY = player.getCollisionRectangle(); playerRectY.y += playerMovement.y;
+        Rectangle playerRectX = player.getCollisionRectangle();
+        playerRectX.x += playerMovement.x;
+        Rectangle playerRectY = player.getCollisionRectangle();
+        playerRectY.y += playerMovement.y;
         boolean blockedX = false;
         boolean blockedY = false;
         for (int x = 0; x < GameState.WIDTH; x++) {
             for (int y = 0; y < GameState.HEIGHT; y++) {
                 Tile t = gameState.getTile(x, y);
 
-                if (t.getType() == GameState.BoxType.OPEN){
+                if (t.getType() == GameState.BoxType.OPEN) {
                     continue;
                 }
 
                 Rectangle box = t.getCollisionRectangle();
                 if (box.overlaps(playerRectX)) {
                     blockedX = true;
-                } if (box.overlaps(playerRectY)) {
+                }
+                if (box.overlaps(playerRectY)) {
                     blockedY = true;
                 }
 
-                if(t.getType() == GameState.BoxType.FLAG && box.overlaps(playerRectY)){
-                    gameFinished();
+                if (t.getType() == GameState.BoxType.FLAG && box.overlaps(playerRectY)) {
+                    GameState state = GameState.getInstance();
+                    String gameId = state.gameId;
+                    String winner = state.name;
+                    conn.sendWinner(gameId, winner);
                 }
             }
             if (blockedX && blockedY)
@@ -183,14 +205,13 @@ public class GameRenderState extends RenderUpdateState {
     }
 
 
-    public void gameFinished(){
-
+    public void gameFinished(String winner) {
         this.exitButton = new TextButton("Exit to Menu", this.textButtonStyle); //Set the button up
         this.exitButton.setBounds(600, 250, 400, 150);
 
         Skin skin = new Skin(Gdx.files.internal("Skin/uiskin.json"));
 
-        final Dialog dialog = new Dialog("Winner", skin) {
+        final Dialog dialog = new Dialog(winner, skin) {
 
             @Override
             public float getPrefWidth() {
@@ -237,10 +258,7 @@ public class GameRenderState extends RenderUpdateState {
 
         dialog.setName("quitDialog");
         stage.addActor(dialog);
-
     }
-
-
 
     public void testEntityCollision() {
         Rectangle playerRect = player.getCollisionRectangle();
@@ -253,10 +271,10 @@ public class GameRenderState extends RenderUpdateState {
 
     public void clampCamera() {
         float BLOCK_PADDING = 1;
-        float playerX = player.getPos().x + GameState.BLOCK_SIZE/2;
+        float playerX = player.getPos().x + GameState.BLOCK_SIZE / 2;
         float playerY = player.getPos().y + GameState.BLOCK_SIZE;
         cam.position.x = MathUtils.clamp(cam.position.x, playerX - GameState.BLOCK_SIZE * BLOCK_PADDING, playerX + GameState.BLOCK_SIZE * BLOCK_PADDING);
-        cam.position.y = MathUtils.clamp(cam.position.y, playerY- GameState.BLOCK_SIZE * BLOCK_PADDING, playerY + GameState.BLOCK_SIZE * BLOCK_PADDING);
+        cam.position.y = MathUtils.clamp(cam.position.y, playerY - GameState.BLOCK_SIZE * BLOCK_PADDING, playerY + GameState.BLOCK_SIZE * BLOCK_PADDING);
     }
 
     public void batchDrawPosSize(SpriteBatch b, Texture t, Vector2 p, Vector2 s) {
@@ -285,8 +303,8 @@ public class GameRenderState extends RenderUpdateState {
             } else {
                 if (e instanceof Bomb) {
                     Vector2 bombPos = e.getPos();
-                    int bx = (int)(bombPos.x / GameState.BLOCK_SIZE);
-                    int by = (int)(bombPos.y / GameState.BLOCK_SIZE);
+                    int bx = (int) (bombPos.x / GameState.BLOCK_SIZE);
+                    int by = (int) (bombPos.y / GameState.BLOCK_SIZE);
                     for (int x = bx - 1; x <= bx + 1; x++) {
                         for (int y = by - 1; y <= by + 1; y++) {
                             Tile t = gameState.getTile(x, y);
@@ -309,6 +327,10 @@ public class GameRenderState extends RenderUpdateState {
 
     @Override
     public void update() {
+        if (gameState.gameFinished) {
+            this.gameFinished(gameState.gameWinner);
+            return;
+        }
         cam.update();
         Vector2 playerMovement = new Vector2(0, 0);
         handleInput(playerMovement);
@@ -339,8 +361,8 @@ public class GameRenderState extends RenderUpdateState {
 //                    System.out.println(player1 + " " + player2 + " " + GameState.getInstance().name);
 //                    System.out.println(posObj);
 
-                    float xpos = (float)posObj.getDouble("xpos");
-                    float ypos = (float)posObj.getDouble("ypos");
+                    float xpos = (float) posObj.getDouble("xpos");
+                    float ypos = (float) posObj.getDouble("ypos");
 
                     opponent.setPos(new Vector2(xpos, ypos));
                 } catch (JSONException e) {
@@ -373,13 +395,13 @@ public class GameRenderState extends RenderUpdateState {
         if (player.getPowerupClass() == PowerupWalkFaster.class)
             powerupCol = Color.BLUE;
         hud.setPowerColor(powerupCol);
-        hud.setPowerSize(((int)(player.getPowerupDuration() * 30)));
+        hud.setPowerSize(((int) (player.getPowerupDuration() * 30)));
         hud.drawHud(hudBatch, GAME_WIDTH, GAME_HEIGHT);
         hudBatch.end();
     }
 
     @Override
-    public void dispose () {
+    public void dispose() {
         batch.dispose();
     }
 }

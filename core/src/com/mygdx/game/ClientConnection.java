@@ -42,8 +42,8 @@ public class ClientConnection {
 
     private ClientConnection() {
         try {
-            //socket = IO.socket("http://localhost:5005");
-            socket = IO.socket("http://10.0.2.2:5005");
+            socket = IO.socket("http://localhost:5005");
+            //socket = IO.socket("http://10.0.2.2:5005");
 
             socket.connect();
         } catch (URISyntaxException e1) {
@@ -74,11 +74,11 @@ public class ClientConnection {
         });
     }
 
-    public void registerLookingForGame(String name, GameHTTPResponse reponse) {
+    public void registerName(String name, GameHTTPResponse reponse) {
         try {
             JSONObject obj = new JSONObject();
-            obj.put("name", GameState.getInstance().name);
-            socket.emit("lookingforplayer", obj);
+            obj.put("name", name);
+            socket.emit("register", obj);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -106,9 +106,6 @@ public class ClientConnection {
                 JSONObject obj = (JSONObject)args[0];
                 response.result(obj);
             }
-        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {}
         });
     }
 
@@ -140,9 +137,25 @@ public class ClientConnection {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+    }
+
+    public void sendWinner(String gameId, String name) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("winner", name);
+            obj.put("gameid", gameId);
+            socket.emit("finishedgame", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void registerWinnerCallback(GameHTTPResponse response) {
+        socket.on("finishedgame", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                response.result(obj);
             }
         });
     }

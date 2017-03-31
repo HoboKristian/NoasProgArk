@@ -28,6 +28,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
@@ -47,7 +50,30 @@ public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
 		this.gameRenderState.init();
 
 		GameState.getInstance().registerGameStateListener(this);
-		GameState.getInstance().setRenderState(GameState.RenderState.GAME);
+		GameState.getInstance().setRenderState(GameState.RenderState.MENU);
+
+
+		NameInputField listener = new NameInputField(new NameInputFieldListener() {
+			@Override
+			public void result(String text, boolean cancelled) {
+				System.out.println("sdfsdf");
+				if (!cancelled && !text.matches(""))
+					GameState.getInstance().name = text;
+				ClientConnection.getInstance().registerName(GameState.getInstance().name, new GameHTTPResponse() {
+					@Override
+					public void result(JSONObject result) {
+						System.out.println("cyka");
+						try {
+							GameState.getInstance().gameId = result.getString("gameid");
+							GameState.getInstance().setRenderState(GameState.RenderState.GAME);
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		});
+		Gdx.input.getTextInput(listener, "Set name", "", "Your name");
 	}
 
 	@Override
@@ -74,5 +100,6 @@ public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
 				this.currentRenderState = gameMenuState;
 				break;
 		}
+		this.currentRenderState.getsFocus();
 	}
 }

@@ -6,6 +6,7 @@ package com.mygdx.game;
 
 public abstract class RenderUpdateState {
     public abstract void init();
+    public abstract void getsFocus();
     public abstract void render();
     public abstract void update();
     public abstract void dispose();
