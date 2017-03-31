@@ -50,7 +50,7 @@ public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
 		this.gameRenderState.init();
 
 		GameState.getInstance().registerGameStateListener(this);
-		GameState.getInstance().setRenderState(GameState.RenderState.MENU);
+		GameState.getInstance().setRenderState(GameState.RenderState.GAME);
 
 
 		NameInputField listener = new NameInputField(new NameInputFieldListener() {

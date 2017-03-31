@@ -28,6 +28,7 @@ public class TextureLoader {
 		entity.put(EntityType.PLAYER, new Texture(Gdx.files.internal("Player/p1_front.png")));
 		entity.put(EntityType.POWERUP_WALK_FAST, new Texture(Gdx.files.internal("Items/gemBlue.png")));
 		entity.put(EntityType.POWERUP_WALK_WALL, new Texture(Gdx.files.internal("Items/gemYellow.png")));
+		entity.put(EntityType.POWERUP_INVERT_TOUCHPAD, new Texture(Gdx.files.internal("Items/gemYellow.png")));
 	}
 	
 	public Texture getTextureForType(Object type) {

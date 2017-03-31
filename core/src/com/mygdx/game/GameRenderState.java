@@ -97,9 +97,12 @@ public class GameRenderState extends RenderUpdateState {
         key.registerKeyListener(door);
         entities.add(key);
 
-        PowerupWalkFaster powerup = new PowerupWalkFaster(new Vector2(12 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(3, 3));
-        entities.add(powerup);
-        powerup.registerPowerupListener(player);
+        PowerupWalkFaster powerupWalkFaster = new PowerupWalkFaster(new Vector2(12 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(3, 3));
+        entities.add(powerupWalkFaster);
+        PowerupInvertTouchpad powerupInvertTouchpad = new PowerupInvertTouchpad(new Vector2(13 * GameState.BLOCK_SIZE, 9 * GameState.BLOCK_SIZE), new Vector2(3, 3));
+        entities.add(powerupInvertTouchpad);
+        powerupWalkFaster.registerPowerupListener(player);
+        powerupInvertTouchpad.registerPowerupListener(player);
 
 
         textButtonStyle = new TextButton.TextButtonStyle();
@@ -146,14 +149,15 @@ public class GameRenderState extends RenderUpdateState {
     }
 
     public void handleInput(Vector2 playerMovement) {
+        int directionInverter = player.invertedControls ? -1 : 1;
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            playerMovement.x -= player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
+            playerMovement.x -= player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime() * directionInverter;
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            playerMovement.x += player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime();
+            playerMovement.x += player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime() * directionInverter;
         if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            playerMovement.y += player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
+            playerMovement.y += player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime() * directionInverter;
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            playerMovement.y -= player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime();
+            playerMovement.y -= player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime() * directionInverter;
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             if (player.getNumberOfBombs() > 0) {
                 Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
@@ -334,8 +338,9 @@ public class GameRenderState extends RenderUpdateState {
         cam.update();
         Vector2 playerMovement = new Vector2(0, 0);
         handleInput(playerMovement);
-        playerMovement = new Vector2(touchpad.getKnobPercentX() * player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime(),
-                touchpad.getKnobPercentY() * player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime());
+        int directionInverter = player.invertedControls ? -1 : 1;
+        playerMovement = new Vector2(touchpad.getKnobPercentX() * player.getVelocity().x * 5 * Gdx.graphics.getDeltaTime() * directionInverter,
+                touchpad.getKnobPercentY() * player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime() * directionInverter);
         testPlayerMovement(playerMovement);
         testEntityCollision();
 
