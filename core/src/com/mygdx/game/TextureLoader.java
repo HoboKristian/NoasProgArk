@@ -26,8 +26,10 @@ public class TextureLoader {
 		entity.put(EntityType.FLASH_BOMB, new Texture(Gdx.files.internal("Items/bombFlash.png")));
 		entity.put(EntityType.KEY, new Texture(Gdx.files.internal("Items/keyYellow.png")));
 		entity.put(EntityType.PLAYER, new Texture(Gdx.files.internal("Player/p1_front.png")));
-		entity.put(EntityType.POWERUP_WALK_FAST, new Texture(Gdx.files.internal("Items/gemBlue.png")));
-		entity.put(EntityType.POWERUP_WALK_WALL, new Texture(Gdx.files.internal("Items/gemYellow.png")));
+		entity.put(EntityType.OPPONENT, new Texture(Gdx.files.internal("Player/p2_front.png")));
+		entity.put(EntityType.POWERUP_WALK_FAST, new Texture(Gdx.files.internal("Items/gemRed.png")));
+		entity.put(EntityType.POWERUP_WALK_SLOWER, new Texture(Gdx.files.internal("Items/gemGreen.png")));
+		entity.put(EntityType.POWERUP_WALK_FREEZE, new Texture(Gdx.files.internal("Items/gemBlue.png")));
 		entity.put(EntityType.POWERUP_INVERT_TOUCHPAD, new Texture(Gdx.files.internal("Items/gemYellow.png")));
 	}
 	

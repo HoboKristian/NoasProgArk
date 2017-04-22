@@ -9,12 +9,12 @@ import java.util.List;
  * Created by kristianflatheimjensen on 31/03/2017.
  */
 
-public class PowerupInvertTouchpad extends StaticEntity {
+public class PowerupWalkSlower extends StaticEntity {
     private List<PowerupListener> listeners = new ArrayList<PowerupListener>();
     private boolean pickedUp;
 
-    public PowerupInvertTouchpad(Vector2 pos, Vector2 size) {
-        super(pos, size, TextureLoader.getInstance().getTextureForType(GameState.EntityType.POWERUP_INVERT_TOUCHPAD));
+    public PowerupWalkSlower(Vector2 pos, Vector2 size) {
+        super(pos, size, TextureLoader.getInstance().getTextureForType(GameState.EntityType.POWERUP_WALK_SLOWER));
         this.pickedUp = false;
     }
 
@@ -37,7 +37,7 @@ public class PowerupInvertTouchpad extends StaticEntity {
         // Remove the listener from the list of the registered listeners
         this.listeners.remove(listener);
     }
-    protected void notifyPowerupListeners (PowerupInvertTouchpad powerup) {
+    protected void notifyPowerupListeners (PowerupWalkSlower powerup) {
         // Notify each of the listeners in the list of registered listeners
         for (PowerupListener listener : listeners) {
             listener.powerupPickedUp(powerup);

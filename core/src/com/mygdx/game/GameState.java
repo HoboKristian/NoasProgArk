@@ -17,7 +17,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class GameState {
 	public static enum BoxType {OPEN, BOX, STONE, DOOR, FLAG};
-	public static enum EntityType {BOMB, FLASH_BOMB, KEY, PLAYER, POWERUP_WALK_FAST, POWERUP_WALK_WALL, POWERUP_INVERT_TOUCHPAD};
+	public static enum EntityType {BOMB, FLASH_BOMB, KEY, PLAYER, OPPONENT, POWERUP_WALK_FAST, POWERUP_WALK_SLOWER, POWERUP_WALK_FREEZE, POWERUP_INVERT_TOUCHPAD};
 	
 	public static int WIDTH;
 	public static int HEIGHT;

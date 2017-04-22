@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -14,11 +16,11 @@ public class Player extends MoveableEntity implements PowerupListener{
 	int numberOfBombs;
 	public boolean invertedControls = false;
 
-	List<PowerupEffectWrapper> powerups = new ArrayList<>();
+	public List<PowerupEffectWrapper> powerups = new ArrayList<>();
 	
 	public Player(Vector2 pos, Vector2 size, Texture tex) {
 		super(pos, size, tex);
-		this.velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
+		this.velocity = new Vector2(GameState.BLOCK_SIZE * 2, GameState.BLOCK_SIZE * 2);
 		numberOfBombs = 3;
 	}
 	public void move(Vector2 movement) {
@@ -61,32 +63,52 @@ public class Player extends MoveableEntity implements PowerupListener{
 	public void powerupPickedUp(Entity powerup) {
 		powerupClass = powerup.getClass();
 		if (powerup instanceof PowerupWalkFaster) {
-			powerups.add(new PowerupEffectWrapper(5, new PowerupEffect() {
+			powerups.add(new PowerupEffectWrapper(5, Color.RED, new PowerupEffect() {
 				@Override
 				public void start() {
 					velocity = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
 				}
 
 				@Override
-				public void end() {
-					velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
-				}
+				public void end() { velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2); }
 			}));
 		} else if (powerup instanceof PowerupInvertTouchpad) {
-			System.out.println("inve");
-			powerups.add(new PowerupEffectWrapper(5, new PowerupEffect() {
-				@Override
-				public void start() {
-					System.out.println("inverted");
-					invertedControls = true;
-				}
-
-				@Override
-				public void end() {
-					invertedControls = false;
-				}
-			}));
+			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "invert");
+		} else if (powerup instanceof PowerupWalkSlower) {
+			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "slower");
+		} else if (powerup instanceof PowerupWalkFreeze) {
+			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "freeze");
 		}
+	}
+
+	public void powerupInvertControls() {
+		powerups.add(new PowerupEffectWrapper(5, Color.YELLOW, new PowerupEffect() {
+			@Override
+			public void start() { invertedControls = true; }
+
+			@Override
+			public void end() { invertedControls = false; }
+		}));
+	}
+
+	public void powerupWalkSlower() {
+		powerups.add(new PowerupEffectWrapper(5, Color.GREEN, new PowerupEffect() {
+			@Override
+			public void start() { velocity = new Vector2(GameState.BLOCK_SIZE / 4, GameState.BLOCK_SIZE / 4); }
+
+			@Override
+			public void end() { velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2); }
+		}));
+	}
+
+	public void powerupWalkFreeze() {
+		powerups.add(new PowerupEffectWrapper(5, Color.BLUE, new PowerupEffect() {
+			@Override
+			public void start() { velocity = new Vector2(0, 0); }
+
+			@Override
+			public void end() { velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2); }
+		}));
 	}
 
 	public int getNumberOfBombs(){
@@ -101,9 +123,15 @@ interface PowerupEffect {
 
 class PowerupEffectWrapper {
 	public float durationLeft;
+	public float baseDuration;
 	public PowerupEffect powerupEffect;
-	PowerupEffectWrapper(float duration, PowerupEffect effect) {
+	public Color powerupColor;
+	PowerupEffectWrapper(float duration, Color col, PowerupEffect effect) {
 		this.durationLeft = duration;
+		this.baseDuration = duration;
+
+		this.powerupColor = col;
+
 		this.powerupEffect = effect;
 		this.powerupEffect.start();
 	}

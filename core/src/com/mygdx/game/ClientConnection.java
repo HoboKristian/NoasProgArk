@@ -42,7 +42,8 @@ public class ClientConnection {
 
     private ClientConnection() {
         try {
-            socket = IO.socket("http://localhost:5005");
+            //socket = IO.socket("http://localhost:5005");
+            socket = IO.socket("http://192.168.1.218:5005");
             //socket = IO.socket("http://10.0.2.2:5005");
 
             socket.connect();
@@ -50,7 +51,8 @@ public class ClientConnection {
             e1.printStackTrace();
         }
 
-        String base_url = "10.0.2.2";
+        String base_url = "192.168.1.218";
+        //String base_url = "10.0.2.2";
         String base_port = "5005";
         String base_api_path = "api/";
         this.base_uri = String.format("http://%s:%s/%s", base_url, base_port, base_api_path);
@@ -140,6 +142,7 @@ public class ClientConnection {
     }
 
     public void sendWinner(String gameId, String name) {
+        System.out.println(String.format("%s %s %s", gameId, name, GameState.getInstance().name));
         JSONObject obj = new JSONObject();
         try {
             obj.put("winner", name);
@@ -150,8 +153,30 @@ public class ClientConnection {
         }
     }
 
+    public void sendPowerup(String gameId, String name, String type) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("player", name);
+            obj.put("gameid", gameId);
+            obj.put("type", type);
+            socket.emit("sendpowerup", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void registerWinnerCallback(GameHTTPResponse response) {
         socket.on("finishedgame", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                response.result(obj);
+            }
+        });
+    }
+
+    public void registerPowerupCallback(GameHTTPResponse response) {
+        socket.on("powerup", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 JSONObject obj = (JSONObject)args[0];
