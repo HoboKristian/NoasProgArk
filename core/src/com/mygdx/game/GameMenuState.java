@@ -43,14 +43,14 @@ public class GameMenuState extends RenderUpdateState {
         this.helpButton.setBounds(200, 000, 400, 75);
         this.stage.addActor(this.helpButton); //Add the button to the stage to perform rendering and take input.
 
-        this.findPlayerButton = new TextButton("Find", textButtonStyle); //Set the button up
+        this.findPlayerButton = new TextButton("Find", textButtonStyle);
         this.findPlayerButton.setBounds(200, 100, 400, 75);
-        this.stage.addActor(this.findPlayerButton); //Add the button to the stage to perform rendering and take input.
+        this.stage.addActor(this.findPlayerButton);
 
         this.helpButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                System.out.println("HELP");
+                GameState.getInstance().setRenderState(GameState.RenderState.HELP);
             }
         });
         this.findPlayerButton.addListener(new ChangeListener() {

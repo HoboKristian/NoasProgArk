@@ -37,6 +37,7 @@ public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
 	GameListState gameListState;
 	GameMenuState gameMenuState;
 	GameRenderState gameRenderState;
+	GameHelpState gameHelpState;
 
 	RenderUpdateState currentRenderState;
 
@@ -45,15 +46,16 @@ public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
 		this.gameListState = new GameListState();
 		this.gameMenuState = new GameMenuState();
 		this.gameRenderState = new GameRenderState();
+		this.gameHelpState = new GameHelpState();
 
 		this.gameListState.init();
 		this.gameMenuState.init();
 		this.gameRenderState.init();
+		this.gameHelpState.init();
 		GameDialog.getInstance().init();
 
 		GameState.getInstance().registerGameStateListener(this);
 		GameState.getInstance().setRenderState(GameState.RenderState.MENU);
-
 
 		NameInputField listener = new NameInputField(new NameInputFieldListener() {
 			@Override
@@ -100,6 +102,9 @@ public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
 				break;
 			case MENU:
 				this.currentRenderState = gameMenuState;
+				break;
+			case HELP:
+				this.currentRenderState = gameHelpState;
 				break;
 		}
 		this.currentRenderState.getsFocus();

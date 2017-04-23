@@ -13,6 +13,7 @@ public class GameState {
 	public static enum BoxType {OPEN, BOX, STONE, DOOR, FLAG};
 	public static enum EntityType {BOMB, FLASH_BOMB, KEY, PLAYER, OPPONENT, POWERUP_WALK_FAST, POWERUP_WALK_SLOWER, POWERUP_WALK_FREEZE, POWERUP_INVERT_TOUCHPAD, POWERUP_MYSTERYBOX};
 	public static enum DialogType {INVITED_PLAYER, INVITED_BY_PLAYER}
+	public static enum RenderState {GAME, MENU, LIST, HELP};
 
 	public static int WIDTH;
 	public static int HEIGHT;
@@ -32,7 +33,6 @@ public class GameState {
 	public boolean gameFinished;
 	public String name = getSaltString();
 
-	public static enum RenderState {GAME, MENU, LIST};
 	private RenderState renderState;
 	private List<GameStateListener> statelisteners = new ArrayList<GameStateListener>();
 
