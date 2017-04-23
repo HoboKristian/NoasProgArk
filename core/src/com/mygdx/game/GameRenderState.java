@@ -1,26 +1,17 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
-
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -30,7 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
@@ -131,16 +121,19 @@ public class GameRenderState extends RenderUpdateState {
         PowerupInvertTouchpad powerupInvertTouchpad = new PowerupInvertTouchpad(new Vector2(7 * GameState.BLOCK_SIZE, 3 * GameState.BLOCK_SIZE), new Vector2(3, 3));
         PowerupWalkSlower powerupWalkSlower = new PowerupWalkSlower(new Vector2(8 * GameState.BLOCK_SIZE, 3 * GameState.BLOCK_SIZE), new Vector2(3, 3));
         PowerupWalkFreeze powerupWalkFreeze = new PowerupWalkFreeze(new Vector2(5 * GameState.BLOCK_SIZE, 3 * GameState.BLOCK_SIZE), new Vector2(3, 3));
+        PowerupMysterybox powerupMysterybox = new PowerupMysterybox(new Vector2(9 * GameState.BLOCK_SIZE, 3 * GameState.BLOCK_SIZE), new Vector2(3, 3));
 
         entities.add(powerupWalkFaster);
         entities.add(powerupInvertTouchpad);
         entities.add(powerupWalkSlower);
         entities.add(powerupWalkFreeze);
+        entities.add(powerupMysterybox);
 
         powerupWalkFaster.registerPowerupListener(player);
         powerupInvertTouchpad.registerPowerupListener(player);
         powerupWalkSlower.registerPowerupListener(player);
         powerupWalkFreeze.registerPowerupListener(player);
+        powerupMysterybox.registerPowerupListener(player);
 
         //Create new TouchPad with the created style
         touchpad = new Touchpad(10, touchpadStyle);

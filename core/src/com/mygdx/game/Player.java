@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Player extends MoveableEntity implements PowerupListener{
 	Vector2 velocity;
@@ -17,10 +18,15 @@ public class Player extends MoveableEntity implements PowerupListener{
 	public boolean invertedControls = false;
 
 	public List<PowerupEffectWrapper> powerups = new ArrayList<>();
-	
+
+	private final Vector2 fast_velocity   = new Vector2(GameState.BLOCK_SIZE    , GameState.BLOCK_SIZE    );
+	private final Vector2 slow_velocity   = new Vector2(GameState.BLOCK_SIZE / 4, GameState.BLOCK_SIZE / 4);
+	private final Vector2 normal_velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
+	private final Vector2 freeze_velocity = new Vector2(0, 0);
+
 	public Player(Vector2 pos, Vector2 size, Texture tex) {
 		super(pos, size, tex);
-		this.velocity = new Vector2(GameState.BLOCK_SIZE * 2, GameState.BLOCK_SIZE * 2);
+		this.velocity = normal_velocity.cpy();
 		numberOfBombs = 3;
 	}
 	public void move(Vector2 movement) {
@@ -61,23 +67,33 @@ public class Player extends MoveableEntity implements PowerupListener{
 	
 	@Override
 	public void powerupPickedUp(Entity powerup) {
-		powerupClass = powerup.getClass();
 		if (powerup instanceof PowerupWalkFaster) {
-			powerups.add(new PowerupEffectWrapper(5, Color.RED, new PowerupEffect() {
-				@Override
-				public void start() {
-					velocity = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
-				}
-
-				@Override
-				public void end() { velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2); }
-			}));
+			this.powerupWalkFaster();
 		} else if (powerup instanceof PowerupInvertTouchpad) {
 			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "invert");
 		} else if (powerup instanceof PowerupWalkSlower) {
 			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "slower");
 		} else if (powerup instanceof PowerupWalkFreeze) {
 			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "freeze");
+		} else if (powerup instanceof PowerupMysterybox) {
+			Random rand = new Random();
+			int n = rand.nextInt(4);
+			switch (n) {
+				case 0:
+					this.powerupWalkFaster();
+					break;
+				case 1:
+					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "invert");
+					break;
+				case 2:
+					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "slower");
+					break;
+				case 3:
+					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "freeze");
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
@@ -91,23 +107,33 @@ public class Player extends MoveableEntity implements PowerupListener{
 		}));
 	}
 
+	public void powerupWalkFaster() {
+		powerups.add(new PowerupEffectWrapper(5, Color.RED, new PowerupEffect() {
+			@Override
+			public void start() { velocity = fast_velocity.cpy(); }
+
+			@Override
+			public void end() { velocity = normal_velocity.cpy(); }
+		}));
+	}
+
 	public void powerupWalkSlower() {
 		powerups.add(new PowerupEffectWrapper(5, Color.GREEN, new PowerupEffect() {
 			@Override
-			public void start() { velocity = new Vector2(GameState.BLOCK_SIZE / 4, GameState.BLOCK_SIZE / 4); }
+			public void start() { velocity = slow_velocity.cpy(); }
 
 			@Override
-			public void end() { velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2); }
+			public void end() { velocity = normal_velocity.cpy(); }
 		}));
 	}
 
 	public void powerupWalkFreeze() {
 		powerups.add(new PowerupEffectWrapper(5, Color.BLUE, new PowerupEffect() {
 			@Override
-			public void start() { velocity = new Vector2(0, 0); }
+			public void start() { velocity = freeze_velocity.cpy(); }
 
 			@Override
-			public void end() { velocity = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2); }
+			public void end() { velocity = normal_velocity.cpy(); }
 		}));
 	}
 
