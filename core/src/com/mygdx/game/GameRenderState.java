@@ -442,7 +442,7 @@ public class GameRenderState extends RenderUpdateState {
         stage.act(Gdx.graphics.getDeltaTime());
 
         hudBatch.begin();
-        hud.drawHud(hudBatch, player.powerups, player.getPos(), opponent.getPos(), 31 * GameState.BLOCK_SIZE, GameState.BLOCK_SIZE, GAME_WIDTH, GAME_HEIGHT);
+        hud.drawHud(hudBatch, player.powerups, player.getPos(), opponent.getPos(), player.getNumberOfBombs(), 31 * GameState.BLOCK_SIZE, GameState.BLOCK_SIZE, GAME_WIDTH, GAME_HEIGHT);
         hudBatch.end();
     }
 

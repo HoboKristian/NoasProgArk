@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 public class Hud {
-	private int topRightCount = 3;
 	private Texture topRightTex;
 	private ShapeRenderer shapeRenderer;
 	private ShapeRenderer progressRenderer;
@@ -26,7 +25,7 @@ public class Hud {
 		progressRenderer = new ShapeRenderer();
 	}
 
-	public void drawHud(SpriteBatch batch, List<PowerupEffectWrapper> powerups, Vector2 playerPos, Vector2 opponentPos, float goalY, float startY, float gameWidth, float gameHeight) {
+	public void drawHud(SpriteBatch batch, List<PowerupEffectWrapper> powerups, Vector2 playerPos, Vector2 opponentPos, int topRightCount, float goalY, float startY, float gameWidth, float gameHeight) {
 		for (int i = 0; i < topRightCount; i++) {
 			batch.draw(topRightTex, 15 + (i * 80), gameHeight - 100, 80, 80);
 		}

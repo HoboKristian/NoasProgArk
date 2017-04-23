@@ -9,8 +9,8 @@ public class Bomb extends StaticEntity {
 	
 	float timeToDetonate;
 	float timeToRemove;
-	static float BOMBTIMER = 1;
-	static float FLASHTIMER = 0.5f;
+	static float BOMBTIMER = 0.5f;
+	static float FLASHTIMER = 0.2f;
 	
 	boolean detonating;
 	
@@ -21,7 +21,6 @@ public class Bomb extends StaticEntity {
 		detonating = true;
 		timeToDetonate = Bomb.BOMBTIMER;
 		timeToRemove = Bomb.FLASHTIMER;
-
 	}
 	
 	@Override
