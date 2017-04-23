@@ -81,13 +81,16 @@ public class GameListState extends RenderUpdateState {
     }
 
     private void addButtons() {
+        boolean skippedSelf = false;
         for (int i = 0; i < players.length; i++) {
             String opponent = players[i];
-            if (opponent.equals(GameState.getInstance().name))
+            if (opponent.equals(GameState.getInstance().name)) {
+                skippedSelf = true;
                 continue;
+            }
 
             TextButton button = new TextButton(opponent, textButtonStyle); //Set the button up
-            button.setBounds(0, 100 * (i+1), 200, 75);
+            button.setBounds(0, 100 * (i + 1 - (skippedSelf ? 1 : 0)), 200, 75);
             stage.addActor(button); //Add the button to the stage to perform rendering and take input.
 
             button.addListener(new ChangeListener() {

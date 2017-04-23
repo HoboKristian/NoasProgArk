@@ -291,9 +291,7 @@ public class GameRenderState extends RenderUpdateState {
         t.row();
         t.add(exitButton).width(btnSize).height(btnSize);
         dialog.getButtonTable().add(t).center().padBottom(btnSize);
-        dialog.show(stage).setPosition(
-                (GAME_WIDTH / 2) - (720 / 2),
-                (GAME_HEIGHT) - (GAME_HEIGHT - 40));
+        dialog.show(stage).setBounds(10, 10, this.stage.getViewport().getScreenWidth() - 20, this.stage.getViewport().getScreenHeight() - 20);
 
         dialog.setName("quitDialog");
         stage.addActor(dialog);
