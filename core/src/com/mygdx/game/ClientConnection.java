@@ -192,6 +192,19 @@ public class ClientConnection {
         }
     }
 
+    public void sendBuff(String gameId, String target, String buff, float duration) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("target", target);
+            obj.put("gameid", gameId);
+            obj.put("buff", buff);
+            obj.put("duration", duration);
+            socket.emit("buff", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendWinner(String gameId, String name) {
         System.out.println(String.format("%s %s %s", gameId, name, GameState.getInstance().name));
         JSONObject obj = new JSONObject();
@@ -204,16 +217,16 @@ public class ClientConnection {
         }
     }
 
-    public void sendPowerup(String gameId, String name, String type) {
+    public void sendPowerup(String gameId, String target, String type) {
         JSONObject obj = new JSONObject();
         try {
-            obj.put("player", name);
-            obj.put("gameid", gameId);
+            obj.put("target", target);
             obj.put("type", type);
             socket.emit("sendpowerup", obj);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        this.sendBuff(gameId, target, type, 5000);
     }
 
     public void registerWinnerCallback(GameHTTPResponse response) {

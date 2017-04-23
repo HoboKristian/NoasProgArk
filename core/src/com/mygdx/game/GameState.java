@@ -28,6 +28,7 @@ public class GameState {
 
 	public String gameId;
 	public String gameWinner;
+	public String gameOpponent;
 	public boolean gameFinished;
 	public String name = getSaltString();
 

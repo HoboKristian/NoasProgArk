@@ -25,7 +25,7 @@ public class Hud {
 		progressRenderer = new ShapeRenderer();
 	}
 
-	public void drawHud(SpriteBatch batch, List<PowerupEffectWrapper> powerups, Vector2 playerPos, Vector2 opponentPos, int topRightCount, float goalY, float startY, float gameWidth, float gameHeight) {
+	public void drawHud(SpriteBatch batch, List<PowerupEffectWrapper> powerups, Vector2 playerPos, Vector2 opponentPos, int topRightCount, String[] opponentBuffs, float goalY, float startY, float gameWidth, float gameHeight) {
 		for (int i = 0; i < topRightCount; i++) {
 			batch.draw(topRightTex, 15 + (i * 80), gameHeight - 100, 80, 80);
 		}
@@ -60,16 +60,45 @@ public class Hud {
 		progressRenderer.end();
 		batch.begin();
 		this.drawProgressImage(batch, TextureLoader.getInstance().getTextureForType(GameState.BoxType.FLAG), gameWidth, gameHeight, goalY, startY, goalY);
-		this.drawProgressImage(batch, TextureLoader.getInstance().getTextureForType(GameState.EntityType.OPPONENT), gameWidth, gameHeight, goalY, startY, opponentPos.y);
+		this.drawProgressImage(batch, TextureLoader.getInstance().getTextureForType(GameState.EntityType.OPPONENT), gameWidth, gameHeight, goalY, startY, opponentPos.y, opponentBuffs);
 		this.drawProgressImage(batch, TextureLoader.getInstance().getTextureForType(GameState.EntityType.PLAYER), gameWidth, gameHeight, goalY, startY, playerPos.y);
 	}
 
 	private void drawProgressImage(SpriteBatch batch, Texture texture, float gameWidth, float gameHeight, float goalY, float startY, float yPosition) {
+		this.drawProgressImage(batch, texture, gameWidth, gameHeight, goalY, startY, yPosition, new String[0]);
+	}
+
+	private void drawProgressImage(SpriteBatch batch, Texture texture, float gameWidth, float gameHeight, float goalY, float startY, float yPosition, String[] opponentBuffs) {
 		float progressHeight = gameHeight - 20;
 
-		batch.draw(texture,
-				gameWidth - progressPadding - progressWidth - progressImageSize / 2, progressPadding + Math.min(yPosition / goalY, 1.0f) * progressHeight - progressImageSize / 2,
-				progressImageSize, progressImageSize);
+		float imageX = gameWidth - progressPadding - progressWidth - progressImageSize / 2;
+		float imageY = progressPadding + Math.min(yPosition / goalY, 1.0f) * progressHeight - progressImageSize / 2;
+		batch.draw(texture, imageX, imageY, progressImageSize, progressImageSize);
+
+		batch.end();
+		shapeRenderer.begin(ShapeType.Filled);
+		for (int i = 0; i < opponentBuffs.length; i++) {
+			String buff = opponentBuffs[i];
+			Color buffColor = Color.BLACK;
+			switch (buff) {
+				case "faster":
+					buffColor = Color.RED;
+					break;
+				case "slower":
+					buffColor = Color.GREEN;
+					break;
+				case "freeze":
+					buffColor = Color.BLUE;
+					break;
+				case "invert":
+					buffColor = Color.YELLOW;
+					break;
+			}
+			shapeRenderer.setColor(buffColor);
+			shapeRenderer.rect(imageX - 10, imageY + 5 * i, 10, 5);
+		}
+		shapeRenderer.end();
+		batch.begin();
 	}
 	
 	private void drawRoundedRect(float x, float y, float w, float h) {

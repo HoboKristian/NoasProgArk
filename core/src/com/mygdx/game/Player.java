@@ -70,11 +70,11 @@ public class Player extends MoveableEntity implements PowerupListener{
 		if (powerup instanceof PowerupWalkFaster) {
 			this.powerupWalkFaster();
 		} else if (powerup instanceof PowerupInvertTouchpad) {
-			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "invert");
+			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().gameOpponent, "invert");
 		} else if (powerup instanceof PowerupWalkSlower) {
-			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "slower");
+			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().gameOpponent, "slower");
 		} else if (powerup instanceof PowerupWalkFreeze) {
-			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "freeze");
+			ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().gameOpponent, "freeze");
 		} else if (powerup instanceof PowerupMysterybox) {
 			Random rand = new Random();
 			int n = rand.nextInt(4);
@@ -83,13 +83,13 @@ public class Player extends MoveableEntity implements PowerupListener{
 					this.powerupWalkFaster();
 					break;
 				case 1:
-					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "invert");
+					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().gameOpponent, "invert");
 					break;
 				case 2:
-					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "slower");
+					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().gameOpponent, "slower");
 					break;
 				case 3:
-					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().name, "freeze");
+					ClientConnection.getInstance().sendPowerup(GameState.getInstance().gameId, GameState.getInstance().gameOpponent, "freeze");
 					break;
 				default:
 					break;
@@ -108,6 +108,7 @@ public class Player extends MoveableEntity implements PowerupListener{
 	}
 
 	public void powerupWalkFaster() {
+		ClientConnection.getInstance().sendBuff(GameState.getInstance().gameId, GameState.getInstance().name, "faster", 5000);
 		powerups.add(new PowerupEffectWrapper(5, Color.RED, new PowerupEffect() {
 			@Override
 			public void start() { velocity = fast_velocity.cpy(); }

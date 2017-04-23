@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,9 +59,10 @@ public class GameRenderState extends RenderUpdateState {
     TextButton exitButton;
     BitmapFont font;
 
-
     static float GAME_WIDTH;
     static float GAME_HEIGHT;
+
+    String[] opponentBuffs = {};
 
     @Override
     public void init() {
@@ -392,16 +394,22 @@ public class GameRenderState extends RenderUpdateState {
                         String player1 = result.getString("player1");
                         String player2 = result.getString("player2");
                         JSONObject posObj;
-
+                        JSONArray buffs;
 
                         if (GameState.getInstance().name.matches(player1)) {
                             posObj = result.getJSONObject("2");
+                            buffs = result.getJSONArray("2buffs");
+                            GameState.getInstance().gameOpponent = player2;
                         } else {
                             posObj = result.getJSONObject("1");
+                            buffs = result.getJSONArray("1buffs");
+                            GameState.getInstance().gameOpponent = player1;
                         }
 
-//                    System.out.println(player1 + " " + player2 + " " + GameState.getInstance().name);
-//                    System.out.println(posObj);
+                        opponentBuffs = new String[buffs.length()];
+                        for (int i = 0; i < buffs.length(); i++) {
+                            opponentBuffs[i] = buffs.getString(i);
+                        }
 
                         float xpos = (float) posObj.getDouble("xpos");
                         float ypos = (float) posObj.getDouble("ypos");
@@ -434,7 +442,7 @@ public class GameRenderState extends RenderUpdateState {
         stage.act(Gdx.graphics.getDeltaTime());
 
         hudBatch.begin();
-        hud.drawHud(hudBatch, player.powerups, player.getPos(), opponent.getPos(), player.getNumberOfBombs(), 31 * GameState.BLOCK_SIZE, GameState.BLOCK_SIZE, GAME_WIDTH, GAME_HEIGHT);
+        hud.drawHud(hudBatch, player.powerups, player.getPos(), opponent.getPos(), player.getNumberOfBombs(), opponentBuffs, 31 * GameState.BLOCK_SIZE, GameState.BLOCK_SIZE, GAME_WIDTH, GAME_HEIGHT);
         hudBatch.end();
     }
 
