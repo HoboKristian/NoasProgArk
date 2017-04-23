@@ -1,26 +1,16 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import org.json.JSONArray;
@@ -78,7 +68,11 @@ public class GameListState extends RenderUpdateState {
 
     @Override
     public void update() {
-
+        Dialog gameStateDialog = GameState.getInstance().getDialogToShow();
+        if (gameStateDialog != null) {
+            stage.addActor(gameStateDialog);
+            gameStateDialog.show(stage).setBounds(10, 10, this.stage.getViewport().getScreenWidth() - 20, this.stage.getViewport().getScreenHeight() - 20);
+        }
     }
 
     @Override
@@ -88,31 +82,50 @@ public class GameListState extends RenderUpdateState {
 
     private void addButtons() {
         for (int i = 0; i < players.length; i++) {
-            String p = players[i];
-            if (p.equals(GameState.getInstance().name))
+            String opponent = players[i];
+            if (opponent.equals(GameState.getInstance().name))
                 continue;
 
-            TextButton button = new TextButton(p, textButtonStyle); //Set the button up
-            button.setBounds(0, 0 + 100 * (i+1), 200, 75);
+            TextButton button = new TextButton(opponent, textButtonStyle); //Set the button up
+            button.setBounds(0, 100 * (i+1), 200, 75);
             stage.addActor(button); //Add the button to the stage to perform rendering and take input.
 
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
+                    GameDialog.getInstance().invitedOpponent = opponent;
+                    GameState.getInstance().setDialogToShow(GameState.DialogType.INVITED_PLAYER);
+
                     ClientConnection conn = ClientConnection.getInstance();
-                    conn.createGameWith("Kristian", p, new GameHTTPResponse() {
+                    conn.invitePlayer(GameState.getInstance().name, opponent, new GameHTTPResponse() {
                         @Override
                         public void result(JSONObject result) {
                             try {
-                                GameState.getInstance().gameId = result.getString("gameid");
-                                GameState.getInstance().setRenderState(GameState.RenderState.GAME);
+                                boolean answer = result.getBoolean("answer");
+                                if (answer) {
+                                    System.out.println("cerategmame - " + opponent);
+                                    conn.createGameWith(GameState.getInstance().name, opponent, new GameHTTPResponse() {
+                                        @Override
+                                        public void result(JSONObject result) {
+                                            try {
+                                                GameState.getInstance().gameId = result.getString("gameid");
+                                                GameState.getInstance().setRenderState(GameState.RenderState.GAME);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            System.out.println("gameid");
+                                        }
+                                    });
+                                } else {
+                                    if (GameState.getInstance().currentShowingDialog != null) {
+                                        GameState.getInstance().currentShowingDialog.hide();
+                                    }
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            System.out.println("gameid");
                         }
                     });
-                    System.out.println("creategamE" + p);
                 }
             });
         }

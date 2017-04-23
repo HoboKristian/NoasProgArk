@@ -114,6 +114,7 @@ public class GameRenderState extends RenderUpdateState {
 
     public void resetState() {
         entities = new Array<>();
+        GameState.getInstance().loadMap();
 
         Vector2 playerPos = new Vector2(9 * GameState.BLOCK_SIZE, 2 * GameState.BLOCK_SIZE);
         Vector2 playerSize = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
@@ -149,8 +150,6 @@ public class GameRenderState extends RenderUpdateState {
         //Create a Stage and add TouchPad
         stage = new Stage(new FillViewport(GAME_WIDTH, GAME_HEIGHT), batch);
         stage.addActor(touchpad);
-
-        GameState.getInstance().loadMap();
     }
 
     public void getsFocus() {

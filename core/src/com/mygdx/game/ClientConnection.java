@@ -93,10 +93,61 @@ public class ClientConnection {
         });
     }
 
+    public void invitePlayer(String name, String opponent, GameHTTPResponse response) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("player1", name);
+            obj.put("player2", opponent);
+            socket.emit("inviteplayer", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.on("answerinvite", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                response.result(obj);
+            }
+        });
+    }
+
+    public void cancelInvite(String name, String opponent) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("player1", name);
+            obj.put("player2", opponent);
+            socket.emit("cancelinvite", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void acceptInvite(String name, String opponent) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("player1", name);
+            obj.put("player2", opponent);
+            socket.emit("acceptinvite", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void declineInvite(String name, String opponent) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("player1", name);
+            obj.put("player2", opponent);
+            socket.emit("declineinvite", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void createGameWith(String name, String opponent, GameHTTPResponse response) {
         try {
             JSONObject obj = new JSONObject();
-            obj.put("player1", GameState.getInstance().name);
+            obj.put("player1", name);
             obj.put("player2", opponent);
             socket.emit("creategame", obj);
         } catch (JSONException e) {
@@ -177,6 +228,26 @@ public class ClientConnection {
 
     public void registerPowerupCallback(GameHTTPResponse response) {
         socket.on("powerup", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                response.result(obj);
+            }
+        });
+    }
+
+    public void registerInvitedCallback(GameHTTPResponse response) {
+        socket.on("invited", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = (JSONObject)args[0];
+                response.result(obj);
+            }
+        });
+    }
+
+    public void registerCancelInviteCallback(GameHTTPResponse response) {
+        socket.on("cancelinvite", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 JSONObject obj = (JSONObject)args[0];

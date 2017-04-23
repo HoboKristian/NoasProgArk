@@ -1,24 +1,19 @@
 package com.mygdx.game;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class GameState {
 	public static enum BoxType {OPEN, BOX, STONE, DOOR, FLAG};
 	public static enum EntityType {BOMB, FLASH_BOMB, KEY, PLAYER, OPPONENT, POWERUP_WALK_FAST, POWERUP_WALK_SLOWER, POWERUP_WALK_FREEZE, POWERUP_INVERT_TOUCHPAD};
-	
+	public static enum DialogType {INVITED_PLAYER, INVITED_BY_PLAYER}
+
 	public static int WIDTH;
 	public static int HEIGHT;
 
@@ -43,6 +38,9 @@ public class GameState {
 	public static GameState getInstance(){
 		return instance;
 	}
+
+	private DialogType dialogToShow;
+	public Dialog currentShowingDialog;
 
 	protected String getSaltString() {
 		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -125,9 +123,35 @@ public class GameState {
 		map[x][y] = t;
 	}
 
+	public void setDialogToShow(DialogType dialogType) {
+		this.dialogToShow = dialogType;
+	}
+
+	public Dialog getDialogToShow() {
+		if (this.dialogToShow == null)
+			return null;
+
+		Dialog dialog = null;
+		switch (this.dialogToShow) {
+			case INVITED_BY_PLAYER:
+				dialog = GameDialog.getInstance().getInvitedByPlayerDialog();
+				break;
+			case INVITED_PLAYER:
+				dialog = GameDialog.getInstance().getInvitedPlayerDialog();
+				break;
+		}
+		this.dialogToShow = null;
+		currentShowingDialog = dialog;
+		return dialog;
+	}
+
 	public void setRenderState(RenderState renderState) {
 		this.renderState = renderState;
 		notifyGameStateListeners(this.renderState);
+	}
+
+	public RenderState getRenderState() {
+		return this.renderState;
 	}
 
 	public void setGameFinished(String winner) {

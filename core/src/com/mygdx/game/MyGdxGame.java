@@ -45,9 +45,11 @@ public class MyGdxGame extends ApplicationAdapter implements GameStateListener {
 		this.gameListState = new GameListState();
 		this.gameMenuState = new GameMenuState();
 		this.gameRenderState = new GameRenderState();
+
 		this.gameListState.init();
 		this.gameMenuState.init();
 		this.gameRenderState.init();
+		GameDialog.getInstance().init();
 
 		GameState.getInstance().registerGameStateListener(this);
 		GameState.getInstance().setRenderState(GameState.RenderState.MENU);
