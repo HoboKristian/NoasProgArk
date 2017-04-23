@@ -28,9 +28,9 @@ public class GameHelpState extends RenderUpdateState {
         stage = new Stage(new ScreenViewport()); //Set up a stage for the ui
         batch = new SpriteBatch();
 
-        helpImages.add(new Texture(Gdx.files.internal("Player/help1.png")));
-        helpImages.add(new Texture(Gdx.files.internal("Player/help2.png")));
-        helpImages.add(new Texture(Gdx.files.internal("Player/help3.png")));
+        helpImages.add(new Texture(Gdx.files.internal("Player/newhelp1.png")));
+        helpImages.add(new Texture(Gdx.files.internal("Player/newhelp2.png")));
+        helpImages.add(new Texture(Gdx.files.internal("Player/newhelp3.png")));
     }
 
     public void getsFocus() {

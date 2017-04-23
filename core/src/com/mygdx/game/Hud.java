@@ -14,10 +14,10 @@ public class Hud {
 	private ShapeRenderer shapeRenderer;
 	private ShapeRenderer progressRenderer;
 
-	float progressWidth = 2.0f;
+	float progressWidth = 8.0f;
 
-	float progressImageSize = 20.0f;
-	float progressPadding = 10.0f;
+	float progressImageSize = 80.0f;
+	float progressPadding = 40.0f;
 
 	public Hud() {
 		topRightTex = TextureLoader.getInstance().getTextureForType(GameState.EntityType.BOMB);
@@ -43,7 +43,7 @@ public class Hud {
 				float yStart = gameHeight - (powerupHeight + topPadding) * (yIndex + 1);
 
 				shapeRenderer.setColor(powerup.powerupColor);
-				this.drawRoundedRect((gameWidth / 2) - powerSize, yStart - 2, powerSize + 2, powerupHeight + 2);
+				this.drawRoundedRect((gameWidth / 2) - 150, yStart - 2, powerSize, powerupHeight);
 				//shapeRenderer.setColor(Color.valueOf("33abe8"));
 				//this.drawRoundedRect((gameWidth / 2) - powerSize, yStart, powerSize, powerupHeight);
 				yIndex++;

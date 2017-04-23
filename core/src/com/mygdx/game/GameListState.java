@@ -2,7 +2,10 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -26,6 +29,11 @@ public class GameListState extends RenderUpdateState {
     TextButton.TextButtonStyle textButtonStyle;
     Stage stage;
     ClientConnection conn;
+    Label titleLabel;
+    SpriteBatch batch;
+
+    float aroundW;
+    float aroundH;
 
     @Override
     public void init() {
@@ -35,6 +43,16 @@ public class GameListState extends RenderUpdateState {
         font.getData().setScale(4);
         textButtonStyle.font = font;
         stage = new Stage(new ScreenViewport()); //Set up a stage for the ui
+        batch = new SpriteBatch();
+
+        Skin skin = new Skin(Gdx.files.internal("Skin/uiskin.json"));
+        titleLabel = new Label("Available Players", skin);
+        titleLabel.setBounds(this.stage.getWidth() / 2 - 200, this.stage.getHeight() - 300, 200, 75);
+        titleLabel.setFontScale(4);
+        this.stage.addActor(titleLabel);
+
+        aroundW = this.stage.getWidth() / 15;
+        aroundH = this.stage.getHeight() / 10;
     }
 
     public void getsFocus() {
@@ -59,8 +77,20 @@ public class GameListState extends RenderUpdateState {
     public void render() {
         Gdx.input.setInputProcessor(stage); //Start taking input from the ui
 
-        Gdx.gl.glClearColor(0.7f, 0.7f, 0.7f, 1);
+        Gdx.gl.glClearColor(0.7f, 0.8f, 0.7f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        Texture t = TextureLoader.getInstance().getTextureForType(GameState.BoxType.BOX);
+        batch.begin();
+        for (int x = 0; x < this.stage.getWidth(); x += aroundW) {
+            batch.draw(t, x, 0, aroundW, aroundH);
+            batch.draw(t, x, this.stage.getHeight() - aroundH, aroundW, aroundH);
+        }
+        for (int y = 0; y < this.stage.getHeight(); y += aroundH) {
+            batch.draw(t, 0, y, aroundW, aroundH);
+            batch.draw(t, this.stage.getWidth() - aroundW, y, aroundW, aroundH);
+        }
+        batch.end();
 
         stage.act(Gdx.graphics.getDeltaTime()); //Perform ui logic
         stage.draw(); //Draw the ui
@@ -90,7 +120,7 @@ public class GameListState extends RenderUpdateState {
             }
 
             TextButton button = new TextButton(opponent, textButtonStyle); //Set the button up
-            button.setBounds(0, 100 * (i + 1 - (skippedSelf ? 1 : 0)), 200, 75);
+            button.setBounds(titleLabel.getX(), titleLabel.getY() - (100 * (i + 1 - (skippedSelf ? 1 : 0))), 200, 75);
             stage.addActor(button); //Add the button to the stage to perform rendering and take input.
 
             button.addListener(new ChangeListener() {
