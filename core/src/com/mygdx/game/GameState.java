@@ -25,9 +25,10 @@ public class GameState {
 	public Vector2 opponentPos = new Vector2(0, 0);
 	
 	public static int BLOCK_SIZE = 4;
-	
+
 	private Tile[][] map;
-	
+	private Tile[][] baseMap;
+
 	private static final GameState instance = new GameState();
 
 	public String gameId;
@@ -66,7 +67,7 @@ public class GameState {
 		for (int i = 0; i < lines.length; i++) {
 			reversed_lines[i] = lines[lines.length - i - 1];
 		}
-		map = new Tile[WIDTH][HEIGHT];
+		baseMap = new Tile[WIDTH][HEIGHT];
 		int y = 0;
 		for (String l : reversed_lines) {
 			int x = 0;
@@ -91,10 +92,20 @@ public class GameState {
 				}
 				Vector2 pos = new Vector2(x * GameState.BLOCK_SIZE, y * GameState.BLOCK_SIZE);
 				Vector2 size = new Vector2(GameState.BLOCK_SIZE, GameState.BLOCK_SIZE);
-				map[x][y] = new Tile(pos, size, b);
+				baseMap[x][y] = new Tile(pos, size, b);
 				x++;
 			}
 			y++;
+		}
+		loadMap();
+	}
+
+	public void loadMap() {
+		map = new Tile[WIDTH][HEIGHT];
+		for (int x = 0; x < WIDTH; x++) {
+			for (int y = 0; y < HEIGHT; y++) {
+				map[x][y] = baseMap[x][y];
+			}
 		}
 	}
 	

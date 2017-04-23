@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -148,6 +149,8 @@ public class GameRenderState extends RenderUpdateState {
         //Create a Stage and add TouchPad
         stage = new Stage(new FillViewport(GAME_WIDTH, GAME_HEIGHT), batch);
         stage.addActor(touchpad);
+
+        GameState.getInstance().loadMap();
     }
 
     public void getsFocus() {
@@ -183,6 +186,7 @@ public class GameRenderState extends RenderUpdateState {
         });
     }
 
+    int bombLimiter = 0;
     public void handleInput(Vector2 playerMovement) {
         int directionInverter = player.invertedControls ? -1 : 1;
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
@@ -193,8 +197,10 @@ public class GameRenderState extends RenderUpdateState {
             playerMovement.y += player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime() * directionInverter;
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
             playerMovement.y -= player.getVelocity().y * 5 * Gdx.graphics.getDeltaTime() * directionInverter;
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            if (player.getNumberOfBombs() > 0) {
+        if (bombLimiter > 0) bombLimiter--;
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isTouched() && !touchpad.isTouched()) {
+            if (player.getNumberOfBombs() > 0 && bombLimiter <= 0) {
+                bombLimiter = 15; //make sure you dont put all bombs down in an instant. This should be 1/4 second.
                 Vector2 bombPos = new Vector2(player.getPos().x + GameState.BLOCK_SIZE / 4, player.getPos().y + GameState.BLOCK_SIZE / 4);
                 Vector2 bombSize = new Vector2(GameState.BLOCK_SIZE / 2, GameState.BLOCK_SIZE / 2);
                 entities.add(new Bomb(bombPos, bombSize));

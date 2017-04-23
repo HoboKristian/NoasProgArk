@@ -41,7 +41,7 @@ public class Hud {
 
 			for (PowerupEffectWrapper powerup : powerups) {
 				float powerSize = 300 * (powerup.durationLeft / powerup.baseDuration);
-				float yStart = gameHeight - ((powerupHeight + topPadding) * (yIndex + 1);
+				float yStart = gameHeight - (powerupHeight + topPadding) * (yIndex + 1);
 
 				shapeRenderer.setColor(powerup.powerupColor);
 				this.drawRoundedRect((gameWidth / 2) - powerSize, yStart - 2, powerSize + 2, powerupHeight + 2);
